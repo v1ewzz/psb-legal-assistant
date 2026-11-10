@@ -106,6 +106,9 @@ def test_premise_correction_silent_for_correct_numbers():
     # короткие числа и реквизиты (П-17/2024) не триггерят коррекцию
     assert pipeline.premise_correction(
         "Договор П-17/2024 действует до 31.12.2026?", chunks) is None
+    # годы (4 цифры) не триггерят коррекцию — главный регресс: был -8 баллов
+    assert pipeline.premise_correction(
+        "Какая плата была в декабре 2024 года?", chunks) is None
 
 
 def test_finalize_one_line_no_markdown():

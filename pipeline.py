@@ -89,36 +89,82 @@ def _finalize(answer: str) -> str:
 def premise_correction(question: str, chunks: list[dict]) -> Optional[str]:
     """Ложная предпосылка в числе (T5): «плата 500 000» → шаблон §4.2.
 
-    Число из вопроса не найдено в evidence, но в найденных документах есть
-    число той же разрядности → отвечаем кодом: «правильное …, а не <X> (реквизит)».
-    Без LLM —� предметно и без риска выдумки.
+    Строгие условия срабатывания (иначе молчим — см. калибровку 27→19):
+    - число в вопросе ≥6 цифр (годы «2024» не триггерят);
+    - число отсутствует в evidence целиком;
+    - в найденных чанках есть число ТОЙ ЖЕ разрядности в денежном/множественном
+      контексте (руб/₽/мес/млн) — иначе это просто другой вопрос, лезем молча.
     """
     flat_question = question.replace("\u00a0", " ")
     ev_flat = "".join(str(c["text"]) for c in chunks).replace("\u00a0", " ")
-    ev_norm = re.sub(r"\s+", "", ev_flat)
+    ev_norm = re.sub(r"\s+", "", ev_flat).replace(",", ".")
 
     for m in re.finditer(r"\d[\d\u00a0 ]*(?:\d)|\d+(?:[.,]\d+)?", flat_question):
         raw = re.sub(r"[\u00a0 ]", "", m.group().replace(",", "."))
-        if len(raw) < 4 or raw in ev_norm.replace(",", "."):
+        if len(raw) < 6 or raw in ev_norm:
             continue
-        same_width = re.findall(r"\d[\d\u00a0 ]{4,}(?:\d)?", ev_flat)
-        candidates = sorted({m.strip() for m in same_width}, key=len)
-        # идём по чанкам в порядке релевантности BM25 (§9.2): платему — наиболее близкий
-        for chunk in chunks:
-            for candidate in candidates:
-                if len(re.sub(r"\s+", "", candidate)) != len(raw):
+        # только числа в денежном/процентном контексте — той же разрядности
+        # «450 000 рублей», а также «450 000 (пропись) рублей» — допустима скобка
+        candidates = [a.strip() for a in re.findall(
+            r"(\d[\d\u00a0 ]{4,}\d)\s*(?:\([^)]{0,120}\)\s*)?(?:руб|₽|%)", ev_flat)]
+        for candidate in sorted(set(candidates), key=lambda s: len(s.strip())):
+            cand = candidate.strip()
+            if len(re.sub(r"\s+", "", cand)) != len(raw):
+                continue
+            for chunk in chunks:
+                sentence, item = _sentence_with_number(str(chunk["text"]), cand)
+                if item is None:
                     continue
-                if candidate in chunk["text"]:
-                    ref = (chunk.get("short_name", "?") + ", "
-                           + str(chunk.get("path", "") or "")).strip(", ")
-                    return _finalize(
-                        f"В найденных документах такого числа нет. В {ref} указано "
-                        f"«{candidate}», а не {m.group()}; привожу контекст: "
-                        f"«{chunk['text'][:400]}». Если в вопросе другая формулировка — "
-                        f"проверим по документам отдельно."
-                    )
-        break  # первая же неподтверждённая цифра вопроса → продолжаем обычным конвейером
+                where = chunk.get("short_name", "?")
+                ref = f"(п. {item})" if item else ""
+                claim = _truncate_sentence(sentence, 180)
+                return _finalize(
+                    f"В {where} указано {claim} {ref}, а не {m.group()} — "
+                    f"числа {raw} в найденных документах нет."
+                )
+        break  # первая же неподтверждённая цифра вопроса → обычный конвейер
     return None
+
+
+def _sentence_with_number(chunk_text: str, number_with_spaces: str) -> tuple[str, Optional[str]]:
+    """Найти предложение с числом и пункт-реквизит («3.1») этого предложения.
+
+    Сплит по `(?<=[.!?])` отрывает «3.1.» в отдельный фрагмент — такие
+    пункты-огрызки приклеиваем назад к следующему предложению.
+    """
+    stripped = number_with_spaces.strip()
+    parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", chunk_text) if p.strip()]
+    merged: list[str] = []
+    i = 0
+    while i < len(parts):
+        part = parts[i]
+        # «3.1.» целиком ИЛИ хвост фрагмента вида «Арендная плата\n3.1.»
+        trailing = re.fullmatch(r"\d+(?:[.,]\d+)+\.", part)
+        end_marker = re.search(r"(?:\n|^)(\d+(?:[.,]\d+)+\.)$", part)
+        if end_marker and not trailing and i + 1 < len(parts) and len(part) <= 60:
+            head = part[: end_marker.start(1)].strip()
+            if head:
+                merged.append(head)
+            merged.append(end_marker.group(1) + " " + parts[i + 1])
+            i += 2
+        elif re.fullmatch(r"\d+(?:[.,]\d+)+\.", part) and i + 1 < len(parts):
+            merged.append(part + " " + parts[i + 1])
+            i += 2
+        else:
+            merged.append(part)
+            i += 1
+    for part in merged:
+        if stripped in part:
+            item = re.match(r"^(\d+(?:[.,]\d+)+)\.\s*", part)
+            return part, item.group(1).replace(",", ".") if item else None
+    return "", None
+
+
+def _truncate_sentence(sentence: str, limit: int) -> str:
+    text = " ".join(sentence.split())
+    if len(text) <= limit:
+        return text
+    return text[:limit - 1] + "…"
 
 
 def answer_one(question: str, ctx: dict, deadline: float) -> str:
@@ -131,10 +177,11 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
     if not chunks:
         return grounded_refusal(question, ctx)
 
-    # Ложная предпосылка в числе — гейт кодом, до LLM (T5, шаблон §4.2)
-    correction = premise_correction(question, chunks)
-    if correction is not None:
-        return correction
+    # Ложная предпосылка в числе — гейт кодом до LLM (T5); включается флагом T5_GATE
+    if ctx["cfg"].t5_premise_gate:
+        correction = premise_correction(question, chunks)
+        if correction is not None:
+            return correction
 
     prompt, evidence_src = _evidence_bundle(chunks)
     client: Optional[LlmClient] = ctx.get("client")

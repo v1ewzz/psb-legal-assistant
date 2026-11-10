@@ -54,6 +54,12 @@ def clamp_float(value, lo: float, hi: float, default: float) -> float:
     return max(lo, min(hi, f))
 
 
+def _bool_flag(value, default: bool) -> bool:
+    if value is None or not str(value).strip():
+        return default
+    return str(value).strip().lower() in {"1", "true", "yes", "on", "да"}
+
+
 @dataclass
 class Config:
     """Резолвленные настройки окружения (§2.4)."""
@@ -73,6 +79,7 @@ class Config:
     temperature: float = 0.0
     request_timeout_s: float = 45.0     # тайм-аут вызова API: 30–45 с (§2.5)
     model_from_env: bool = False        # модель реально задана в env (не локальный дефолт)
+    t5_premise_gate: bool = False       # гейт ложных предпосылок: T5_GATE=1 (после калибровки)
 
     @property
     def api_ready(self) -> bool:
@@ -113,6 +120,7 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         max_workers=clamp_int(env.get("MAX_WORKERS"), 1, 8, 2),
         temperature=clamp_float(env.get("TEMPERATURE"), 0.0, 2.0, 0.0),
         model_from_env=bool(llm_model_raw),
+        t5_premise_gate=_bool_flag(env.get("T5_GATE"), False),
     )
 
 
