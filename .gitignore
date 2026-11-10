@@ -1,0 +1,46 @@
+# Секреты
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Входные материалы хакатона и данные платформы (не входят в репо)
+data/
+upload/
+*.zip
+!knowledge-base.zip.bak
+
+# Выходы прогонов
+submission.csv
+questions.csv
+outputs/
+trace.jsonl
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE / ОС
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+.DS_Store
+
+# Node (фронт, если будет)
+node_modules/
+dist/
+
+# Сборка сабмита
+build/
+submit.zip

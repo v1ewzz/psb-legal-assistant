@@ -1,0 +1,18 @@
+# Только разрешённый набор зависимостей платформы (§2.6).
+# ВНИМАНИЕ: к сабмиту все версии должны быть pinned (Фаза 0), сейчас — рабочий набор.
+httpx
+numpy
+faiss-cpu
+bm25s
+rapidfuzz
+scikit-learn
+pypdf
+
+# Веб-интерфейс (не входит в сабмит-ZIP, но нужен для webapp.py)
+fastapi
+uvicorn
+pydantic
+python-dotenv
+
+# Dev (тесты) — в платформенный requirements не включать
+pytest
