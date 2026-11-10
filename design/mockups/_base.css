@@ -1,0 +1,56 @@
+/* Общий каркас для всех макетов design/mockups/ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-base);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--text-primary);
+  background: var(--surface-page);
+  background-image: radial-gradient(1200px 500px at 80% -10%, rgba(62, 99, 196, 0.18), transparent 60%),
+                    radial-gradient(900px 400px at -10% 110%, rgba(255, 92, 43, 0.08), transparent 60%);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Топбар макета */
+.topbar {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 10px var(--sp-5);
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(11, 27, 77, 0.6);
+  backdrop-filter: blur(6px);
+  position: sticky; top: 0; z-index: 10;
+}
+.logo {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: var(--fw-bold); font-size: var(--fs-h3); letter-spacing: 0.02em;
+}
+.logo-mark {
+  width: 22px; height: 22px; border-radius: 5px;
+  background: var(--psb-gradient);
+  display: inline-grid; place-items: center;
+  color: #fff; font-size: 12px; font-weight: var(--fw-bold);
+}
+.topbar .tag {
+  margin-left: auto;
+  color: var(--text-muted); font-size: var(--fs-caption);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
+  padding: 3px 10px;
+}
+
+/* Секция-подпись макета */
+.mock-note {
+  max-width: 1180px; margin: var(--sp-4) auto 0; padding: 0 var(--sp-5);
+  color: var(--text-muted); font-size: var(--fs-caption);
+}
+.mock-note b { color: var(--text-secondary); }
+
+h1.mock-title {
+  max-width: 1180px; margin: var(--sp-4) auto 0; padding: 0 var(--sp-5);
+  font-size: var(--fs-h2); font-weight: var(--fw-bold); letter-spacing: -0.01em;
+}
+
+/* Скроллбар */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--surface-hover); border-radius: 5px; }
+::-webkit-scrollbar-track { background: transparent; }

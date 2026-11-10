@@ -1,0 +1,184 @@
+/* ============================================================
+   ПСБ · Юридический ассистент · дизайн-токены (CSS)
+   Источник правды: design/tokens.json — держите в синхроне.
+   Подключение: <link rel="stylesheet" href="design/tokens.css">
+   ============================================================ */
+:root {
+  /* --- Бренд --- */
+  --psb-blue-950: #070F33;
+  --psb-blue-900: #0B1B4D;
+  --psb-blue-850: #102156;
+  --psb-blue-800: #15296E;
+  --psb-blue-700: #1D3585;
+  --psb-blue-600: #2A4A9E;
+  --psb-blue-500: #3E63C4;
+  --psb-orange-500: #FF5C2B;
+  --psb-orange-600: #E8491A;
+  --psb-gradient: linear-gradient(135deg, #FF5C2B 0%, #FF8A50 100%);
+
+  /* --- Поверхности --- */
+  --surface-page: #070F33;
+  --surface-panel: #0B1B4D;
+  --surface-card: #102156;
+  --surface-card-elevated: #15296E;
+  --surface-hover: #1D3585;
+  --border-subtle: rgba(185, 194, 222, 0.14);
+  --border-strong: rgba(185, 194, 222, 0.28);
+
+  /* --- Текст --- */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B9C2DE;
+  --text-muted: #7A86A8;
+  --text-link: #7FA0FF;
+  --text-link-hover: #A5BCFF;
+
+  /* --- Статусы ответа (4 состояния, различимы без чтения текста) ---
+     full    → зелёный  ✓ «Полный ответ»
+     partial → жёлтый   ½ «Частичный ответ»
+     refusal → красный  ✕ «Отказ»
+     error   → серый    ? «Ошибка в вопросе»  */
+  --status-full-color: #2FBF71;
+  --status-full-bg: rgba(47, 191, 113, 0.14);
+  --status-full-border: rgba(47, 191, 113, 0.45);
+
+  --status-partial-color: #F5B301;
+  --status-partial-bg: rgba(245, 179, 1, 0.14);
+  --status-partial-border: rgba(245, 179, 1, 0.45);
+
+  --status-refusal-color: #E5484D;
+  --status-refusal-bg: rgba(229, 72, 77, 0.14);
+  --status-refusal-border: rgba(229, 72, 77, 0.45);
+
+  --status-error-color: #8A93AD;
+  --status-error-bg: rgba(138, 147, 173, 0.14);
+  --status-error-border: rgba(138, 147, 173, 0.45);
+
+  /* --- Состояния --- */
+  --skeleton: rgba(185, 194, 222, 0.10);
+  --skeleton-shimmer: rgba(185, 194, 222, 0.22);
+  --bg-danger: rgba(229, 72, 77, 0.10);
+  --bg-success: rgba(47, 191, 113, 0.10);
+  --hl-fragment: rgba(255, 92, 43, 0.22);
+  --hl-fragment-border: #FF5C2B;
+
+  /* --- Типографика --- */
+  --font-base: 'SB Sans Display', 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  --fs-h1: 28px;
+  --fs-h2: 22px;
+  --fs-h3: 17px;
+  --fs-body: 14.5px;
+  --fs-body-small: 13px;
+  --fs-caption: 11.5px;
+  --fs-badge: 12px;
+  --lh-tight: 1.25;
+  --lh-normal: 1.5;
+  --lh-answer: 1.62;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* --- Отступы (шкала 4/8) --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  /* --- Радиусы --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* --- Тени --- */
+  --shadow-card: 0 2px 12px rgba(3, 7, 22, 0.45);
+  --shadow-modal: 0 12px 48px rgba(3, 7, 22, 0.65);
+
+  /* --- Движение --- */
+  --motion-fast: 120ms ease-out;
+  --motion-normal: 200ms ease-out;
+
+  /* --- Раскладка --- */
+  --chat-max-width: 720px;
+  --sidebar-width: 420px;
+  --timeline-height: 180px;
+}
+
+/* --- Утилиты-компоненты (готовые к копированию в web/) --- */
+
+/* Бейдж статуса: <span class="badge badge--full">…</span> */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-badge);
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+}
+.badge--full    { color: var(--status-full-color);    background: var(--status-full-bg);    border: 1px solid var(--status-full-border); }
+.badge--partial { color: var(--status-partial-color); background: var(--status-partial-bg); border: 1px solid var(--status-partial-border); }
+.badge--refusal { color: var(--status-refusal-color); background: var(--status-refusal-bg); border: 1px solid var(--status-refusal-border); }
+.badge--error   { color: var(--status-error-color);   background: var(--status-error-bg);   border: 1px solid var(--status-error-border); }
+
+/* Чип-ссылка на источник в тексте ответа:
+   <a class="chip" href="#" data-chunk="c2">ТК РФ, ст. 70 · ч. 1</a> */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  margin: 0 1px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-card-elevated);
+  color: var(--text-link);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  vertical-align: 1px;
+  transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
+}
+.chip:hover { background: var(--surface-hover); border-color: var(--psb-blue-500); color: var(--text-link-hover); }
+
+/* Карточка ответа */
+.answer-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: var(--shadow-card);
+}
+
+/* Подсветка фрагмента в просмотре документа */
+.hl {
+  background: var(--hl-fragment);
+  outline: 2px solid var(--hl-fragment-border);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Скелетон на время стриминга */
+.skeleton {
+  background: linear-gradient(90deg, var(--skeleton) 25%, var(--skeleton-shimmer) 50%, var(--skeleton) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Курсор стриминга */
+.stream-cursor {
+  display: inline-block;
+  width: 8px; height: 16px;
+  background: var(--psb-orange-500);
+  animation: blink 900ms step-end infinite;
+  vertical-align: -2px;
+}
+@keyframes blink { 50% { opacity: 0; } }

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>05 · Просмотр документа · ПСБ Юридический ассистент</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="_base.css">
+<style>
+.wrap { max-width: 860px; margin: var(--sp-4) auto var(--sp-6); padding: 0 var(--sp-5); }
+
+/* Модалка просмотра источника: открывается по клику на чип */
+.modal {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+.modal-head {
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.crumbs {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  font-size: var(--fs-caption); color: var(--text-muted);
+}
+.crumbs a { color: var(--text-link); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.crumbs .sep { color: var(--text-muted); opacity: 0.6; }
+.crumbs .here { color: var(--text-primary); font-weight: var(--fw-semibold); }
+
+.modal-head .title { font-size: var(--fs-h3); font-weight: var(--fw-bold); margin-top: 8px; }
+.modal-head .meta {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+}
+.modal-head .meta .tagpill {
+  font-size: var(--fs-caption); padding: 2px 9px; border-radius: var(--radius-pill);
+  background: var(--surface-card-elevated); border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+.modal-head .meta .tagpill--ok { color: var(--status-full-color); border-color: var(--status-full-border); background: var(--status-full-bg); }
+.modal-head .close {
+  margin-left: auto; flex: none; width: 32px; height: 32px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle); background: var(--surface-card);
+  color: var(--text-secondary); display: grid; place-items: center; cursor: pointer;
+}
+
+.modal-body {
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  max-height: 480px; overflow-y: auto;
+}
+.doc-p { color: var(--text-secondary); line-height: 1.75; margin-bottom: 14px; font-size: var(--fs-body); }
+.doc-p .ref-in-text { color: var(--text-muted); font-size: var(--fs-caption); display: block; margin-bottom: 2px; }
+.hl {
+  background: var(--hl-fragment);
+  outline: 2px solid var(--hl-fragment-border);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--text-primary);
+  padding: 1px 0;
+}
+
+.quote-anchor {
+  margin: var(--sp-4) 0;
+  background: var(--surface-card); border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md); padding: 10px 14px;
+  font-size: var(--fs-caption); color: var(--text-muted);
+}
+.quote-anchor b { color: var(--text-secondary); }
+
+.modal-foot {
+  display: flex; gap: var(--sp-3); align-items: center;
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--fs-caption); color: var(--text-muted);
+}
+.modal-foot .btn {
+  margin-left: auto; border: 1px solid var(--border-strong);
+  background: var(--surface-card-elevated); color: var(--text-secondary);
+  border-radius: var(--radius-md); padding: 6px 14px;
+  font-size: var(--fs-body-small); cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="logo"><span class="logo-mark">П</span> ПСБ · Юридический ассистент</span>
+  <span class="tag">макет 05 · данные моковые</span>
+</header>
+
+<h1 class="mock-title">Просмотр источника · модалка по клику на чип</h1>
+<p class="mock-note">
+  <b>Требование кейса:</b> пользователь должен видеть документ и фрагмент, подтверждающий ответ.
+  Хлебные крошки: документ → раздел → пункт. Подсветка — по индексам символов из API (без innerHTML!).
+  Для документов компании — doc_date и valid_from; для законов — только действующая редакция.
+</p>
+
+<div class="wrap">
+  <div class="modal">
+    <div class="modal-head">
+      <div style="min-width:0;">
+        <div class="crumbs">
+          <a href="#">Документы компании</a><span class="sep">›</span>
+          <a href="#">Договор аренды А-08 «Северный Склад»</a><span class="sep">›</span>
+          <a href="#">ДС №1 от 01.10.2024</a><span class="sep">›</span>
+          <span class="here">п. 2.1 Арендная плата</span>
+        </div>
+        <div class="title">Дополнительное соглашение №1 к договору аренды А-08</div>
+        <div class="meta">
+          <span class="tagpill">doc_date: 01.10.2024</span>
+          <span class="tagpill tagpill--ok">valid_from: 01.10.2024 · действует</span>
+          <span class="tagpill">чанк c2 · BM25 0.91</span>
+        </div>
+      </div>
+      <button class="close" title="Закрыть">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="quote-anchor"><b>Цитируемый фрагмент подсвечен.</b> Пользователь пришёл сюда по чипу «ДС №1 · п. 2.1» из ответа про ставку с 01.10.2024.</div>
+
+      <p class="doc-p">
+        <span class="ref-in-text">п. 1. Предмет соглашения</span>
+        Дополнительное соглашение №1 к договору аренды нежилого помещения А-08 «Северный Склад»
+        от 12.06.2023. ООО «Меридиан» (Арендатор) и ООО «Склад-Сервис» (Арендодатель)
+        договорились внести изменения в договор аренды в части размера арендной платы.
+      </p>
+
+      <p class="doc-p">
+        <span class="ref-in-text">п. 2.1</span>
+        <span class="hl">Изложить пункт 3.2 договора в следующей редакции: размер арендной платы
+        составляет 510 000 (пятьсот десять тысяч) рублей в месяц, включая НДС. Изменения
+        вступают в силу с 01 октября 2024 года.</span>
+      </p>
+
+      <p class="doc-p">
+        <span class="ref-in-text">п. 2.2</span>
+        Остальные условия договора аренды А-08, не затронутые настоящим соглашением,
+        остаются без изменений.
+      </p>
+
+      <p class="doc-p">
+        <span class="ref-in-text">п. 3. Подписи</span>
+        Подписано уполномоченными представителями сторон 01.10.2024.
+      </p>
+    </div>
+
+    <div class="modal-foot">
+      Текст извлечён из базы знаний · просмотр только для чтения · фрагмент c2 подтверждает вывод в ответе
+      <button class="btn">Показать в документе целиком</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
