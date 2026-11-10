@@ -31,8 +31,10 @@ SYSTEM_PROMPT = """Ты — юридический ассистент ООО «�
 1) вывод первым предложением, затем 1–3 предложения обоснования;
 2) реквизиты ссылок бери из фрагментов («(п. 3.1)», «ТК РФ, ст. 70») — только те, что там реально есть;
 3) числа, суммы, сроки, названия документов — точно как во фрагментах;
-4) не более 100 слов, одна строка, без маркдауна;
-5) если ответа во фрагментах нет: «В базе знаний нет документов о <X>, поэтому ответить по документам я не могу. По памяти отвечать не буду, так как нормы могли измениться.»"""
+4) числа и даты, заявленные в вопросе, сверяй с фрагментами; если вопрос говорит «X», а в документе «Y» — ответь «Y, а не X (реквизит)»;
+5) если во фрагментах несколько редакций одного документа (разные даты: «ред. 2023», «ред. 2025», «доп. соглашение от 03.09.2024», «действует с 21.04.2025») — укажи обе редакции с датами и какая применяется к событию из вопроса;
+6) не более 100 слов, одна строка, без маркдауна;
+7) если ответа во фрагментах нет: «В базе знаний нет документов о <X>, поэтому ответить по документам я не могу. По памяти отвечать не буду, так как нормы могли измениться.»"""
 
 NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
 T1_TRAP_RE = re.compile(r"90\s+календарн", re.I)
@@ -84,6 +86,41 @@ def _finalize(answer: str) -> str:
     return text
 
 
+def premise_correction(question: str, chunks: list[dict]) -> Optional[str]:
+    """Ложная предпосылка в числе (T5): «плата 500 000» → шаблон §4.2.
+
+    Число из вопроса не найдено в evidence, но в найденных документах есть
+    число той же разрядности → отвечаем кодом: «правильное …, а не <X> (реквизит)».
+    Без LLM —� предметно и без риска выдумки.
+    """
+    flat_question = question.replace("\u00a0", " ")
+    ev_flat = "".join(str(c["text"]) for c in chunks).replace("\u00a0", " ")
+    ev_norm = re.sub(r"\s+", "", ev_flat)
+
+    for m in re.finditer(r"\d[\d\u00a0 ]*(?:\d)|\d+(?:[.,]\d+)?", flat_question):
+        raw = re.sub(r"[\u00a0 ]", "", m.group().replace(",", "."))
+        if len(raw) < 4 or raw in ev_norm.replace(",", "."):
+            continue
+        same_width = re.findall(r"\d[\d\u00a0 ]{4,}(?:\d)?", ev_flat)
+        candidates = sorted({m.strip() for m in same_width}, key=len)
+        # идём по чанкам в порядке релевантности BM25 (§9.2): платему — наиболее близкий
+        for chunk in chunks:
+            for candidate in candidates:
+                if len(re.sub(r"\s+", "", candidate)) != len(raw):
+                    continue
+                if candidate in chunk["text"]:
+                    ref = (chunk.get("short_name", "?") + ", "
+                           + str(chunk.get("path", "") or "")).strip(", ")
+                    return _finalize(
+                        f"В найденных документах такого числа нет. В {ref} указано "
+                        f"«{candidate}», а не {m.group()}; привожу контекст: "
+                        f"«{chunk['text'][:400]}». Если в вопросе другая формулировка — "
+                        f"проверим по документам отдельно."
+                    )
+        break  # первая же неподтверждённая цифра вопроса → продолжаем обычным конвейером
+    return None
+
+
 def answer_one(question: str, ctx: dict, deadline: float) -> str:
     """Общее ядро batch и web (§5.1 v1). ctx: retriever/client/cfg."""
     cfg = ctx["cfg"]
@@ -93,6 +130,11 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
     chunks = retriever.search(question, top_k=cfg.top_k)
     if not chunks:
         return grounded_refusal(question, ctx)
+
+    # Ложная предпосылка в числе — гейт кодом, до LLM (T5, шаблон §4.2)
+    correction = premise_correction(question, chunks)
+    if correction is not None:
+        return correction
 
     prompt, evidence_src = _evidence_bundle(chunks)
     client: Optional[LlmClient] = ctx.get("client")

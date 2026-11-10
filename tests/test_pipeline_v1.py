@@ -88,6 +88,26 @@ def test_verify_lite_number_not_in_evidence():
     assert pipeline._verify_lite(ok, "3.1. Арендная плата 450 000 рублей в месяц") is None
 
 
+def test_premise_correction_fixes_wrong_number():
+    """T5: «плата 500 000» → код отвечает шаблоном «450 000, а не 500 000» без LLM."""
+    chunks = [{"text": "3.1. Арендная плата 450 000 рублей в месяц, включая НДС.",
+               "short_name": "Договор аренды А-08-2024", "path": "блок 2"}]
+    out = pipeline.premise_correction(
+        "Почему по договору арендная плата 500 000 рублей в месяц?", chunks)
+    assert out is not None
+    assert "450 000" in out and "500 000" in out and "не" in out
+
+
+def test_premise_correction_silent_for_correct_numbers():
+    chunks = [{"text": "Арендная плата 450 000 рублей в месяц (п. 3.1).",
+               "short_name": "doc", "path": "блок 1"}]
+    assert pipeline.premise_correction(
+        "Какая арендная плата: 450 000 рублей?", chunks) is None
+    # короткие числа и реквизиты (П-17/2024) не триггерят коррекцию
+    assert pipeline.premise_correction(
+        "Договор П-17/2024 действует до 31.12.2026?", chunks) is None
+
+
 def test_finalize_one_line_no_markdown():
     out = pipeline._finalize("**Вывод:**\nда, верно\n\n(п. 3.1)")
     assert "\n" not in out and "**" not in out
