@@ -55,7 +55,7 @@ def test_api_ready_flag():
 def test_find_input_cwd(tmp_path, monkeypatch):
     (tmp_path / "questions.csv").write_text("id,question\n1,q\n", encoding="utf-8-sig")
     monkeypatch.chdir(tmp_path)
-    assert find_input({}) == tmp_path / "questions.csv"
+    assert find_input({"DATA_DIR": "нет_такой"}).resolve() == (tmp_path / "questions.csv").resolve()
 
 
 def test_find_input_data_dir(tmp_path, monkeypatch):
@@ -70,4 +70,4 @@ def test_find_input_data_dir(tmp_path, monkeypatch):
 def test_find_input_missing(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with pytest.raises(FileNotFoundError):
-        find_input({})
+        find_input({"DATA_DIR": "нет_такой"})

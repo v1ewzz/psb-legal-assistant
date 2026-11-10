@@ -44,18 +44,23 @@ parse_dialog → Analyze (LLM) → Retrieve → Temporal → Reason (LLM)
 
 ## Запуск
 
-> Раздел заполняется по мере готовности. Целевая команда: `docker compose up`.
-
 ```
 # локальная разработка
-python -m pip install -r requirements.txt
+py -m venv .venv && .venv\Scripts\python -m pip install -r requirements.txt
 cp .env.example .env   # заполнить ключи (ключи только в .env, в репо не класть)
 
-# пакетный режим (как на платформе)
-python solution.py
+# сборка индекса v1 (BM25-only) из базы знаний
+.venv\Scripts\python ingest.py --build-index --kb data/kb.zip
 
-# веб-чат
-uvicorn webapp:app --reload
+# пакетный режим (как на платформе): demo questions.csv → submission.csv
+set DATA_DIR=data
+.venv\Scripts\python solution.py
+
+# веб-чат (Фаза 5)
+uvicorn webapp:app
+
+# сборка сабмит-ZIP (плоские модули + артефакты в корне, §2.3)
+.venv\Scripts\python scripts/make_submit.py
 ```
 
 ## Переменные окружения
