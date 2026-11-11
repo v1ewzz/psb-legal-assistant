@@ -99,7 +99,7 @@ def search_filters(query: str, docs: list) -> dict:
     """
     revoked = [d for d in _docs_by_kind(docs, "regulation") if d.get("status") == "revoked"]
     active = [d for d in _docs_by_kind(docs, "regulation") if d.get("status") == "active"]
-    ev, _ = event_date(query)
+    ev, prec = event_date(query or "")
     drop, boost = set(), set()
     marker = bool(OLD_EDITION_MARKERS_RE.search(query or ""))
     cutoff = None
@@ -108,10 +108,15 @@ def search_filters(query: str, docs: list) -> dict:
             cutoff = date.fromisoformat(revoked[0]["valid_to"])
         except ValueError:
             cutoff = None
-    if ev and cutoff and ev < cutoff:
-        boost |= {d["doc_id"] for d in revoked}
-    elif ev and cutoff and ev >= cutoff:
-        if not marker:
+    if ev and cutoff:
+        if prec == "year" and ev.year == cutoff.year:
+            # год перехода редакций («в 2025 году»): дата внутри года неизвестна —
+            # нужны ОБЕ редакции, разграничение по дате перехода
+            boost |= {d["doc_id"] for d in revoked}
+            boost |= {d["doc_id"] for d in active}
+        elif ev < cutoff:
+            boost |= {d["doc_id"] for d in revoked}
+        elif ev >= cutoff and not marker:
             drop |= {d["doc_id"] for d in revoked}
     elif not ev and not marker:
         drop |= {d["doc_id"] for d in revoked}
@@ -124,13 +129,16 @@ def reason_notes(query: str, docs: list, chunks: list) -> list[str]:
     Заметки — данные для модели (и для verify: их текст входит в evidence).
     Пусто, если в вопросе нет даты события и нет версионных конфликтов.
     """
-    ev, _ = event_date(query or "")
+    ev, prec = event_date(query or "")
     notes: list[str] = []
     chunk_docs = {c["doc_id"] for c in chunks or []}
 
     if ev:
-        notes.append(f"Дата события из вопроса: {ev.strftime('%d.%m.%Y')}. "
-                     f"Сопоставляй её с датами действия документов во фрагментах.")
+        if prec == "year":
+            notes.append(f"В вопросе указан только год: {ev.year} (без точной даты).")
+        else:
+            notes.append(f"Дата события из вопроса: {ev.strftime('%d.%m.%Y')}. "
+                         f"Сопоставляй её с датами действия документов во фрагментах.")
 
     # T2: две редакции Регламента
     revoked = [d for d in _docs_by_kind(docs, "regulation") if d.get("status") == "revoked"]
@@ -142,7 +150,13 @@ def reason_notes(query: str, docs: list, chunks: list) -> list[str]:
             act_from = date.fromisoformat(active[0]["valid_from"]) if active[0].get("valid_from") else None
         except ValueError:
             rev_from = rev_to = act_from = None
-        if ev and rev_from and rev_to and rev_from <= ev < rev_to:
+        if ev and prec == "year" and rev_to and ev.year == rev_to.year and rev_from and act_from:
+            notes.append(
+                f"Год {ev.year} — год смены редакций Регламента: до "
+                f"{_fmt(rev_to.isoformat())} действовала редакция от {_fmt(rev_from.isoformat())}, "
+                f"с {_fmt(act_from.isoformat())} действует редакция от {_fmt(act_from.isoformat())}. "
+                f"Разграничь ответ по дате события или приведи оба значения с датами перехода.")
+        elif ev and rev_from and rev_to and rev_from <= ev < rev_to:
             notes.append(
                 f"На {ev.strftime('%d.%m.%Y')} действовал Регламент согласования договоров "
                 f"в редакции от {_fmt(rev_from.isoformat())} — используй значения ИМЕННО этой "

@@ -152,6 +152,25 @@ def test_search_filters_past_event_boosts_revoked(real_ctx):
     assert len(f2["drop_doc_ids"]) == 1   # старую редакцию не тащим без даты
 
 
+def test_transition_year_2025_gets_both_editions(real_ctx):
+    """«В 2025 году» — год перехода: обе редакции + заметка-разграничение."""
+    docs = real_ctx["docs"]
+    q = "В 2025 году какой порог одобрения у генерального директора?"
+    f = temporal.search_filters(q, docs)
+    assert len(f["boost_doc_ids"]) == 2 and not f["drop_doc_ids"]
+    notes = temporal.reason_notes(q, docs, [])
+    assert any("год смены редакций" in n and "01.03.2025" in n for n in notes)
+    assert not any("ИМЕННО этой редакции" in n for n in notes)  # не приписываем одну
+
+
+def test_year_2024_2026_selection(real_ctx):
+    docs = real_ctx["docs"]
+    f24 = temporal.search_filters("В 2024 году какой порог?", docs)
+    f26 = temporal.search_filters("В 2026 году какой порог?", docs)
+    assert len(f24["boost_doc_ids"]) == 1            # старая редакция
+    assert len(f26["drop_doc_ids"]) == 1             # только действующая
+
+
 def test_reason_notes_edition_by_date(real_ctx):
     docs = real_ctx["docs"]
     q = "Договор на 12 млн рублей заключали в августе 2024 года. Нужно ли одобрение ГД?"
