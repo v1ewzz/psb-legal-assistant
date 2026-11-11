@@ -253,6 +253,17 @@ def test_verify_spaced_number_not_substring():
     assert pipeline._verify_lite(ok, "2.4. Договоры на сумму свыше 10 000 000 рублей.") is None
 
 
+def test_search_headers_go_last(real_ctx):
+    """Шапки/полнотекстовые чанки не вытесняют пункты (урок Q5-промпта)."""
+    q = "Договор на 12 млн рублей заключали в августе 2024 года. Нужно ли одобрение ГД?"
+    found = real_ctx["retriever"].search(q, top_k=24, top_n=8)
+    paths = [str(c.get("path")) for c in found]
+    aux_positions = [i for i, p in enumerate(paths) if p in {"шапка", "документ целиком"}]
+    core_positions = [i for i, p in enumerate(paths) if p not in {"шапка", "документ целиком"}]
+    if aux_positions and core_positions:
+        assert max(aux_positions) > min(core_positions)
+
+
 def test_verify_million_expansion():
     """«12 млн» в вопросе покрывает «12 000 000» в ответе (и наоборот)."""
     ok = "Договор на 12 000 000 рублей превышает порог 10 000 000 (п. 2.4)."

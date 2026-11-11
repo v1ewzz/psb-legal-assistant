@@ -229,7 +229,14 @@ class Retriever:
                     order = merged + [i for i in order if i not in merged]
             except Exception as e:  # деградация к RRF-порядку (§8.3)
                 print(f"rerank недоступен: {type(e).__name__}", file=sys.stderr)
-        return [self.chunks[i] for i in order[:top_n]]
+        selected = [self.chunks[i] for i in order[:top_n]]
+        # Шапки и полнотекстовые чанки — в конец выдачи (§9.2): «договор» есть
+        # в каждой шапке, без реранка они вытесняли пункты с нормой
+        core = [c for c in selected
+                if str(c.get("path")) not in {"шапка", "документ целиком"}]
+        aux = [c for c in selected
+               if str(c.get("path")) in {"шапка", "документ целиком"}]
+        return core + aux
 
     def expand(self, selected: list[dict], max_extra: int = 3) -> list[dict]:
         """Расширение (§9.1.7): предыдущий чанк того же документа (контекст
