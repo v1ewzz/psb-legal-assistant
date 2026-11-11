@@ -23,6 +23,8 @@ MODULES = [
     "llm_client.py",
     "ingest.py",
     "retrieval.py",
+    "guard.py",     # v2: парсер диалога, сущности, эвристический standalone
+    "temporal.py",  # v2: даты события, окна редакций (D1), заметки Reason
     "requirements.txt",
 ]
 

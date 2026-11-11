@@ -80,12 +80,35 @@ def load_context() -> dict:
             if refs_path is not None:
                 refs = json.loads(refs_path.read_text(encoding="utf-8"))
             retriever = Retriever(chunks, bm25_path, refs)
+    docs: list = []
+    docs_path = find_artifact(cfg, "docs.json")
+    if docs_path is not None:
+        try:
+            docs = json.loads(docs_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"docs.json не читается: {type(e).__name__}", file=sys.stderr)
     client = LlmClient(cfg) if cfg.api_ready else None
+    rerank_ok = False
+    if client is not None:
+        # пробы старта ≤30 с (§16.3): короткий тайм-аут, без ретраев
+        probe_client = LlmClient(cfg, timeout_s=10, max_retries=0)
+        try:
+            probe = probe_client.probe_all()
+            rerank_ok = bool(probe.get("rerank_ok"))
+            print(f"Пробы: llm={'ок' if probe.get('llm_ok') else 'нет'}; "
+                  f"rerank={'ок' if rerank_ok else 'нет'}; "
+                  f"{probe.get('elapsed_s', '?')} с", file=sys.stderr)
+        except Exception as e:
+            print(f"Пробы не удались: {type(e).__name__}", file=sys.stderr)
+        finally:
+            probe_client.close()
     print(f"Контекст: чанков={len(chunks) if chunks else 0}; "
           f"bm25={'да' if retriever else 'нет'}; "
           f"llm={'да' if client else 'нет'}; "
+          f"rerank={'да' if rerank_ok else 'нет'}; "
           f"режим={cfg.llm_model}", file=sys.stderr)
-    return {"cfg": cfg, "retriever": retriever, "client": client}
+    return {"cfg": cfg, "retriever": retriever, "client": client,
+            "docs": docs, "rerank_ok": rerank_ok}
 
 
 def main() -> None:

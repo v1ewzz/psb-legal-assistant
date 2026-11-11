@@ -1,0 +1,18 @@
+{"id": "1", "type": "direct", "dialog": false, "expected_docs": ["А-08-2024"], "expected_paths": ["п. 3.1", "п. 3.2"], "facts": ["450 000", "5-го числа"]}
+{"id": "2", "type": "law", "dialog": false, "expected_docs": ["ТК_ст70"], "expected_paths": [], "facts": ["шести месяцев"]}
+{"id": "3", "type": "refusal", "dialog": false, "expected_docs": [], "expected_paths": [], "facts": []}
+{"id": "4", "type": "false_premise", "dialog": false, "expected_docs": ["А-08-2024"], "expected_paths": ["п. 3.1", "п. 3.4"], "facts": ["450 000"]}
+{"id": "5", "type": "edition", "dialog": false, "expected_docs": ["ред_2023", "ред_2025"], "expected_paths": ["п. 2.4"], "facts": ["10 000 000", "15 000 000"]}
+{"id": "6", "type": "dialog", "dialog": true, "expected_docs": ["П-17-2024"], "expected_paths": ["п. 6.1"], "facts": ["5 раб", "п. 6.1"]}
+{"id": "7", "type": "direct", "dialog": false, "expected_docs": ["А-08-2024"], "expected_paths": ["п. 4.3"], "facts": ["круглосуточн"]}
+{"id": "8", "type": "direct", "dialog": false, "expected_docs": ["П-17-2024"], "expected_paths": ["п. 6.2"], "facts": ["акта о выявленных недостатках", "п. 6.2"]}
+{"id": "9", "type": "direct", "dialog": false, "expected_docs": ["ПТ-05-2023"], "expected_paths": ["п. 4.1", "п. 4.2"], "facts": ["45 календарных"]}
+{"id": "10", "type": "direct", "dialog": false, "expected_docs": ["ред_2025"], "expected_paths": ["п. 1.3"], "facts": ["руководител"]}
+{"id": "11", "type": "false_premise", "dialog": false, "expected_docs": ["Служебная_записка"], "expected_paths": [], "facts": ["трёх раб"]}
+{"id": "12", "type": "direct", "dialog": false, "expected_docs": ["ТК_ст70"], "expected_paths": [], "facts": ["распространяются"]}
+{"id": "13", "type": "partial", "dialog": false, "expected_docs": ["152ФЗ_ст9"], "expected_paths": [], "facts": ["отозва"]}
+{"id": "14", "type": "direct", "dialog": false, "expected_docs": ["ТК_ст59"], "expected_paths": ["ч. 1"], "facts": ["сезонных"]}
+{"id": "15", "type": "dialog", "dialog": true, "expected_docs": ["А-08-2024"], "expected_paths": ["п. 6.3"], "facts": ["акт"]}
+{"id": "16", "type": "dialog", "dialog": true, "expected_docs": ["П-17-2024"], "expected_paths": ["п. 2.1"], "facts": ["включ"]}
+{"id": "17", "type": "not_established", "dialog": true, "expected_docs": ["ПТ-05-2023"], "expected_paths": ["п. 6.1"], "facts": ["талон"]}
+{"id": "18", "type": "dialog", "dialog": true, "expected_docs": ["ред_2025"], "expected_paths": ["п. 3.2"], "facts": ["рабочих дней"]}

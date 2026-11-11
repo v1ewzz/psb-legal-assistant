@@ -1,10 +1,11 @@
 {
  "kb_sha256": "2aabfab870d2820800c9930b00eab44672be64ae87297fd911e5b43df085e5ca",
- "mode": "bm25_only",
+ "mode": "bm25_v2",
+ "tokenizer": "custom_ru_v2",
  "emb_model": null,
  "emb_dim": null,
- "n_chunks": 255,
- "schema_version": 2,
- "built": "2026-11-10T22:25:13",
- "build_s": 0.14
+ "n_chunks": 768,
+ "schema_version": 3,
+ "built": "2026-11-11T23:23:13",
+ "build_s": 0.19
 }
