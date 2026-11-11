@@ -35,29 +35,41 @@ def _month_no(text: str) -> Optional[int]:
     return None
 
 
+def _is_doc_date(query: str, start: int) -> bool:
+    """Дата-реквизит, а не событие: «договор … от 01.08.2024», «…от 12 февраля 2024».
+    «от» среди двух токенов перед датой — это дата документа."""
+    before = query[max(0, start - 24):start].lower().split()
+    return "от" in before[-2:] if before else False
+
+
 def event_date(query: str) -> tuple[Optional[date], str]:
     """Дата события из вопроса → (date|None, точность 'day'|'month'|'year').
 
     Приоритет (§10.3): dd.mm.yyyy → «N месяца YYYY» / «месяц YYYY» → год.
-    Номера документов («А-08/2024») годом события не считаются.
+    Номера документов («А-08/2024») и даты-реквизиты («договор от 01.08.2024»)
+    событием не считаются.
     """
     q = query or ""
-    m = NUM_DATE_RE.search(q)
-    if m:
+    for m in NUM_DATE_RE.finditer(q):
+        if _is_doc_date(q, m.start()):
+            continue
         try:
             return date(int(m.group(3)), int(m.group(2)), int(m.group(1))), "day"
         except ValueError:
-            pass
-    m = MONTH_YEAR_RE.search(q)
-    if m:
+            continue
+    for m in MONTH_YEAR_RE.finditer(q):
+        if _is_doc_date(q, m.start()):
+            continue
         month = _month_no(m.group(2))
         if month:
             day = int(m.group(1)) if m.group(1) else 1
             try:
                 return date(int(m.group(3)), month, day), ("day" if m.group(1) else "month")
             except ValueError:
-                pass
+                continue
     q_no_nums = DOC_NUM_STRIP_RE.sub(" ", q)
+    q_no_nums = NUM_DATE_RE.sub(" ", q_no_nums)      # полные даты (в т.ч. doc-даты)
+    q_no_nums = MONTH_YEAR_RE.sub(" ", q_no_nums)    # «от 12 февраля 2024» — тоже
     m = YEAR_RE.search(q_no_nums)
     if m:
         year = int(m.group(1) + m.group(2))
