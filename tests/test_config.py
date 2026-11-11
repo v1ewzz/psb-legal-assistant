@@ -33,7 +33,13 @@ def test_clamps():
     cfg = from_env({"TOP_K": "100", "RERANKER_TOP_N": "0", "MAX_TOKENS": "99999",
                     "MAX_WORKERS": "-3", "TEMPERATURE": "5"})
     assert (cfg.top_k, cfg.reranker_top_n, cfg.max_tokens, cfg.max_workers,
-            cfg.temperature) == (8, 1, 8192, 1, 2.0)
+            cfg.temperature) == (8, 1, 8192, 1, 0.0)  # temperature форсирован в 0
+
+
+def test_temperature_forced_zero():
+    """Детерминизм: env TEMPERATURE игнорируется (§12.2, урок разбросов судьи)."""
+    assert from_env({"TEMPERATURE": "0.9"}).temperature == 0.0
+    assert from_env({}).temperature == 0.0
 
 
 def test_max_workers_name_not_workers():

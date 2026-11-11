@@ -76,6 +76,8 @@ class Config:
     reranker_top_n: int = 2
     max_tokens: int = 2000
     max_workers: int = 2
+    # temperature ФОРСИРУЕТСЯ в 0.0 (§12.2): фактический RAG + судья против
+    # эталона — сэмплирование только добавляет разброс; env-значение игнорируем
     temperature: float = 0.0
     request_timeout_s: float = 45.0     # тайм-аут вызова API: 30–45 с (§2.5)
     model_from_env: bool = False        # модель реально задана в env (не локальный дефолт)
@@ -118,7 +120,7 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         reranker_top_n=clamp_int(env.get("RERANKER_TOP_N"), 1, 5, 2),
         max_tokens=clamp_int(env.get("MAX_TOKENS"), 128, 8192, 2000),
         max_workers=clamp_int(env.get("MAX_WORKERS"), 1, 8, 2),
-        temperature=clamp_float(env.get("TEMPERATURE"), 0.0, 2.0, 0.0),
+        temperature=0.0,  # форсировано: детерминизм ответа (§12.2)
         model_from_env=bool(llm_model_raw),
         t5_premise_gate=_bool_flag(env.get("T5_GATE"), False),
     )
