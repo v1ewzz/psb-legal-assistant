@@ -144,6 +144,13 @@ def main() -> None:
                 write_submission(ids, answers, questions, fallback_answer)
                 last_write = time.time()
                 print(f"Промежуточная запись: {len(answers)}/{len(ids)}", file=sys.stderr)
+            # Адаптивный бюджет (U8): проекция перебора времени → fast_mode
+            # (без реранка), чтобы все вопросы успели получить ответ
+            if (not ctx.get("fast_mode") and len(answers) < len(ids)
+                    and time.time() - T0 > 8 * 60
+                    and len(answers) < 0.5 * len(ids)):
+                ctx["fast_mode"] = True
+                print("Fast mode: пропускаем реранк (проекция тайм-аута)", file=sys.stderr)
     write_submission(ids, answers, questions, fallback_answer)
     ex.shutdown(wait=False, cancel_futures=True)
     os._exit(0)  # зависший вызов не удержит процесс (§16.2)

@@ -174,16 +174,42 @@ def test_answer_one_dialog_uses_history_and_notes(real_ctx):
            "Ассистент: Уточните, про одобрение речь?\n"
            "Пользователь: Да, нужно ли было одобрение генерального директора?")
     fake = FakeClient("Да. Действовал Регламент в редакции от 10.01.2023: свыше 10 000 000 рублей — "
-                      "одобрение генерального директора (п. 2.4).",
-                      standalone="Нужно ли было одобрение генерального директора для договора "
-                                 "на 12 млн рублей, заключенного в августе 2024 года?")
+                      "одобрение генерального директора (п. 2.4).")
     ctx = dict(real_ctx, client=fake)
     out = pipeline.answer_one(raw, ctx, deadline=__import__("time").time() + 60)
     user = fake.calls[-1][1]
     assert "История диалога" in user
     assert "Последний вопрос пользователя" in user
-    assert "10.01.2023" in user          # temporal-заметка дошла до Reason
+    assert "10.01.2023" in user          # temporal-заметка (дата из 1-й реплики)
     assert "10 000 000" in out           # ответ прошёл verify-lite
+
+
+def test_verify_allows_question_numbers():
+    """Урок 23.688: «500 000» из вопроса легитимно в ответе «450 000, а не 500 000»."""
+    evidence = "3.1. Арендная плата составляет 450 000 рублей в месяц, включая НДС."
+    answer = "Арендная плата — 450 000 рублей в месяц (п. 3.1), а не 500 000."
+    assert pipeline._verify_lite(answer, evidence) is not None          # без вопроса — провал
+    assert pipeline._verify_lite(
+        answer, evidence,
+        question_text="Почему арендная плата 500 000 рублей в месяц?") is None
+
+
+def test_verify_still_catches_fabricated_numbers():
+    evidence = "3.1. Арендная плата 450 000 рублей."
+    answer = "Плата 620 000 рублей в месяц (п. 3.1)."
+    assert pipeline._verify_lite(answer, evidence, question_text="Какая плата?") is not None
+
+
+def test_fast_mode_skips_rerank(real_ctx):
+    class NoRerankClient(FakeClient):
+        def rerank(self, *a, **kw):
+            raise AssertionError("rerank не должен вызываться в fast_mode")
+
+    fake = NoRerankClient("Арендная плата — 450 000 рублей (п. 3.1).")
+    ctx = dict(real_ctx, client=fake, rerank_ok=True, fast_mode=True)
+    out = pipeline.answer_one("Какая арендная плата по договору с ООО «Северный Склад»?",
+                              ctx, deadline=__import__("time").time() + 60)
+    assert "450 000" in out
 
 
 def test_answer_one_t1_trap_retry_then_fallback(real_ctx):
@@ -193,7 +219,25 @@ def test_answer_one_t1_trap_retry_then_fallback(real_ctx):
                               ctx, deadline=__import__("time").time() + 60)
     assert "90 календарных" not in out
     assert len(fake.calls) == 2          # был один ретрай после провала verify
-    assert "Полный вывод сформировать не удалось" in out  # fallback §16.4
+    assert "Полного вывода по документам сформировать не удалось" in out
+
+
+def test_verify_spaced_number_not_substring():
+    """«500 000» не проходит как подстрока «450000»: ключи сравниваются точно."""
+    evidence = "3.1. Арендная плата 450 000 рублей в месяц."
+    answer = "Плата 500 000 рублей в месяц (п. 3.1)."
+    assert pipeline._verify_lite(answer, evidence) is not None
+    # а настоящий компакт группы распознаётся: «10 000 000» в evidence проходит
+    ok = "Порог — 10 000 000 рублей (п. 2.4)."
+    assert pipeline._verify_lite(ok, "2.4. Договоры на сумму свыше 10 000 000 рублей.") is None
+
+
+def test_verify_million_expansion():
+    """«12 млн» в вопросе покрывает «12 000 000» в ответе (и наоборот)."""
+    ok = "Договор на 12 000 000 рублей превышает порог 10 000 000 (п. 2.4)."
+    assert pipeline._verify_lite(
+        ok, "2.4. Договоры на сумму свыше 10 000 000 рублей одобряются ГД.",
+        question_text="Договор на 12 млн рублей — нужно ли одобрение?") is None
 
 
 def test_answer_one_refusal_when_nothing_found(real_ctx):

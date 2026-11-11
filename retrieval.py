@@ -214,7 +214,9 @@ class Retriever:
         if not order:
             return []
 
-        # реранк (§9.1.6): query = standalone, документы = text_ctx
+        # реранк (§9.1.6): query = standalone, документы = text_ctx.
+        # Страховка от слабого реранкера/клампа прокси: BM25-топ-2 остаётся
+        # в финальной выдаче, даже если реранк его не выбрал
         if client is not None and rerank_query and len(order) > 1:
             try:
                 docs = [self._texts[i][:RERANK_DOC_CHARS] for i in order]
@@ -222,7 +224,9 @@ class Retriever:
                 picked = [order[int(item["index"])] for item in res
                           if 0 <= int(item["index"]) < len(order)]
                 if picked:
-                    order = picked + [i for i in order if i not in picked]
+                    bm25_head = [i for i in order[:2] if i not in picked]
+                    merged = picked + bm25_head
+                    order = merged + [i for i in order if i not in merged]
             except Exception as e:  # деградация к RRF-порядку (§8.3)
                 print(f"rerank недоступен: {type(e).__name__}", file=sys.stderr)
         return [self.chunks[i] for i in order[:top_n]]
