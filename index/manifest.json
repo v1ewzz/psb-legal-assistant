@@ -6,6 +6,6 @@
  "emb_dim": null,
  "n_chunks": 768,
  "schema_version": 3,
- "built": "2026-11-11T23:23:13",
- "build_s": 0.19
+ "built": "2026-11-11T23:54:05",
+ "build_s": 0.58
 }

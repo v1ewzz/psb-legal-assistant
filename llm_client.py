@@ -297,7 +297,7 @@ class LlmClient:
         try:
             vecs = self.embed([
                 "срочный трудовой договор по соглашению сторон",
-                "меридиан договор аренды",
+                "договор аренды нежилого помещения",
             ])
             result["emb_ok"] = vecs.shape[0] == 2
             result["emb_dim"] = int(vecs.shape[1])

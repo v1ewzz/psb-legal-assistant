@@ -401,13 +401,31 @@ def detect_kind(stem: str) -> str:
     return "company_doc"
 
 
-def parse_company(doc_id: str, file_name: str, text: str) -> tuple[dict, list[dict], list[str]]:
+def detect_owner_company(documents: list[tuple[str, str]]) -> Optional[str]:
+    """Владелец базы = самая частая сторона в документах компании.
+
+    Демо-база: ООО «Меридиан». На скрытой базе имя может быть другим —
+    вычисляем, а не зашиваем (против риска «демо-документы ≠ боевые»).
+    """
+    counter: dict[str, int] = {}
+    for name, text in documents:
+        if Path(name).stem.startswith("законы__"):
+            continue
+        for p in re.findall(r"(?:ООО|АО|ПАО|ЗАО)\s*«([^»]+)»", text):
+            counter[p.strip()] = counter.get(p.strip(), 0) + 1
+    if not counter:
+        return None
+    return max(counter.items(), key=lambda kv: kv[1])[0]
+
+
+def parse_company(doc_id: str, file_name: str, text: str,
+                  owner: Optional[str] = None) -> tuple[dict, list[dict], list[str]]:
     """Документ компании → (meta, chunks, notes). Пункты, шапка, full-doc."""
     stem = Path(file_name).stem
     kind = detect_kind(stem)
     lines = text.splitlines()
 
-    parties = sorted(set(re.findall(r"ООО\s*«([^»]+)»", text)))
+    parties = sorted(set(re.findall(r"(?:ООО|АО|ПАО|ЗАО)\s*«([^»]+)»", text)))
     numbers = sorted({norm_doc_number(m.group(1)) for m in DOC_NUMBER_RE.finditer(stem)})
     for ln in lines[:12]:
         for m in DOC_NUMBER_RE.finditer(ln):
@@ -415,19 +433,18 @@ def parse_company(doc_id: str, file_name: str, text: str) -> tuple[dict, list[di
     numbers = sorted(set(numbers))
 
     # --- short_name в стиле эталона (§4.3) ---
-    title_m = re.search(r"№\s*([А-ЯЁ]{1,2}-\d+(?:/\d{4})?)", lines[0] if lines else "")
+    title_m = re.search(r"№\s*([А-ЯЁ]{1,2}-\d+(?:/\d{4})?)", text[:400])
     number = norm_doc_number(title_m.group(1)) if title_m else (numbers[0] if numbers else "")
     if kind == "contract":
-        counterparty = next((p for p in parties if p != "Меридиан"), "")
-        short_name = f"Договор № {number}" if number else "Договор"
+        counterparty = next((p for p in parties if p != owner), "")
         kind_word = "аренды" if "аренд" in stem.lower() else "поставки"
         short_name = f"Договор {kind_word} № {number}"
         if counterparty:
             short_name += f" с ООО «{counterparty}»"
     elif kind == "supplement":
-        short_name = f"Дополнительное соглашение № 1 к договору № {number or 'П-17/2024'}"
+        short_name = f"Дополнительное соглашение № 1 к договору № {number}".rstrip()
     elif kind == "letter":
-        short_name = f"Письмо комплаенс-службы № {number}"
+        short_name = f"Письмо комплаенс-службы № {number}".rstrip()
         d = parse_ru_date(text[:400])
         if d:
             short_name += f" от {d.strftime('%d.%m.%Y')}"
@@ -441,7 +458,7 @@ def parse_company(doc_id: str, file_name: str, text: str) -> tuple[dict, list[di
                 short_name += ", утратил силу"
             short_name += ")"
     elif kind == "memo":
-        short_name = f"Служебная записка № {number or 'ЮО-7'}"
+        short_name = f"Служебная записка № {number}".rstrip()
         d = parse_ru_date(text[:400])
         if d:
             short_name += f" от {d.strftime('%d.%m.%Y')}"
@@ -607,15 +624,17 @@ def build_registry(doc_id: str, file_name: str, meta: dict) -> dict:
     return entry
 
 
-def build_aliases(docs: list[dict]) -> list[dict]:
-    """refs.doc_aliases: doc_id → строки-триггеры exact-ref boost (§9.1.1)."""
+def build_aliases(docs: list[dict], owner: Optional[str] = None) -> list[dict]:
+    """refs.doc_aliases: doc_id → строки-триггеры exact-ref boost (§9.1.1).
+    Компания-владелец (owner) алиасом не становится — она сторона во всех
+    документах и как триггер только добавляет шум."""
     out = []
     for meta in docs:
         aliases = {norm_doc_number(n) for n in meta.get("storage_numbers", [])}
         aliases |= {n for n in meta.get("storage_numbers", [])}
         if meta.get("doc_type") == "company":
             for p in meta.get("parties", []):
-                if p != "Меридиан":
+                if p != owner:
                     aliases.add(p)
         if meta.get("kind") == "letter":
             aliases.add("комплаенс")
@@ -635,12 +654,13 @@ def build_index(kb_zip: Path, outdir: Path) -> int:
     all_chunks: list[dict] = []
     docs_meta: list[dict] = []
     notes_by_doc: dict[str, list] = {}
+    owner = detect_owner_company(documents)
     for file_name, text in documents:
         doc_id = slugify_doc_id(file_name)
         if Path(file_name).stem.startswith("законы__"):
             meta, chunks, notes = parse_law(doc_id, file_name, text)
         else:
-            meta, chunks, notes = parse_company(doc_id, file_name, text)
+            meta, chunks, notes = parse_company(doc_id, file_name, text, owner)
         docs_meta.append(meta)
         notes_by_doc[doc_id] = notes
         all_chunks.extend(chunks)
@@ -659,7 +679,7 @@ def build_index(kb_zip: Path, outdir: Path) -> int:
     refs = {
         "doc_numbers": [{"doc_id": m["doc_id"], "numbers": m["storage_numbers"]}
                         for m in docs_meta if m.get("storage_numbers")],
-        "doc_aliases": build_aliases(docs_meta),
+        "doc_aliases": build_aliases(docs_meta, owner),
     }
 
     # BM25 по text_ctx (§9.1): собственный токенизатор, единый с запросом
