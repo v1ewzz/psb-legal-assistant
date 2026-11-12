@@ -253,8 +253,10 @@ class Retriever:
         # топ-N (по RRF-порядку за срезом). Мульти-фактные вопросы («плата
         # и до какого числа») держат оба факта в соседних пунктах одного
         # договора; срез топ-N систематически терял второй факт (ранги 10-12).
+        # SIBLING_FILL=0 — выключить (бисекция; факт-покрытие падает до 93%).
         sibling_extra = 4
-        if len(selected) >= top_n and len(order) > top_n:
+        if (_sibling_fill_enabled() and len(selected) >= top_n
+                and len(order) > top_n):
             core_docs = {c["doc_id"] for c in selected}
             have = {c["chunk_id"] for c in selected}
             for i in order[top_n:]:
@@ -299,6 +301,15 @@ class Retriever:
                     seen.add(full["chunk_id"])
                     break
         return out[: len(selected) + max_extra]
+
+
+def _sibling_fill_enabled() -> bool:
+    """SIBLING_FILL env-флаг (бисекция регресса 26.199); дефолт — включён."""
+    import os
+    raw = os.environ.get("SIBLING_FILL")
+    if raw is None or not raw.strip():
+        return True
+    return raw.strip().lower() not in {"0", "false", "no", "off", "нет"}
 
 
 def norm_num(token: str) -> str:

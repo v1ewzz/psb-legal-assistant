@@ -106,9 +106,10 @@ def load_context() -> dict:
         finally:
             probe_client.close()
         # Dense-канал: эмбеддинги чанков (гибрид BM25+dense, §9.1.4).
-        # Тайм-бокс 90 с; кэш index/embeddings.npz с именем модели; любой
-        # сбой → деградация BM25-only (§8.3).
-        if retriever is not None and probe.get("emb_ok") and _bool_flag_env(cfg, "DENSE", True):
+        # Дефолт ВЫКЛ до проверки на реальных эмбеддингах платформы: в базе
+        # две редакции Регламента, cosine тянет чанк-близнец (контаминация
+        # редакций). DENSE=1 — включить для A/B; любой сбой → BM25-only (§8.3).
+        if retriever is not None and probe.get("emb_ok") and _bool_flag_env(cfg, "DENSE", False):
             dense = _build_dense(cfg, retriever, client, T0)
     print(f"Контекст: чанков={len(chunks) if chunks else 0}; "
           f"bm25={'да' if retriever else 'нет'}; "
