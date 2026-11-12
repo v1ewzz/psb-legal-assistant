@@ -230,6 +230,21 @@ class Retriever:
             except Exception as e:  # деградация к RRF-порядку (§8.3)
                 print(f"rerank недоступен: {type(e).__name__}", file=sys.stderr)
         selected = [self.chunks[i] for i in order[:top_n]]
+        # Sibling-fill: добор до 4 чанков документов, УЖЕ представленных в
+        # топ-N (по RRF-порядку за срезом). Мульти-фактные вопросы («плата
+        # и до какого числа») держат оба факта в соседних пунктах одного
+        # договора; срез топ-N систематически терял второй факт (ранги 10-12).
+        sibling_extra = 4
+        if len(selected) >= top_n and len(order) > top_n:
+            core_docs = {c["doc_id"] for c in selected}
+            have = {c["chunk_id"] for c in selected}
+            for i in order[top_n:]:
+                if len(selected) >= top_n + sibling_extra:
+                    break
+                chunk = self.chunks[i]
+                if chunk["doc_id"] in core_docs and chunk["chunk_id"] not in have:
+                    selected.append(chunk)
+                    have.add(chunk["chunk_id"])
         # Шапки и полнотекстовые чанки — в конец выдачи (§9.2): «договор» есть
         # в каждой шапке, без реранка они вытесняли пункты с нормой
         core = [c for c in selected

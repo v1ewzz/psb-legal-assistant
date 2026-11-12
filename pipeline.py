@@ -52,13 +52,20 @@ def _normalize_numbers(text: str) -> str:
 
 
 def _evidence_bundle(chunks: list[dict],
-                     notes: Optional[list[str]] = None) -> tuple[str, str]:
-    """Фрагменты ≤N чанков в бюджете символов (§9.2) + текст для verify."""
+                     notes: Optional[list[str]] = None,
+                     *,
+                     per_fragment: Optional[int] = None,
+                     max_chars: Optional[int] = None) -> tuple[str, str]:
+    """Фрагменты ≤N чанков в бюджете символов (§9.2) + текст для verify.
+    per_fragment/max_chars переопределяют глобальные константы (A/B через env:
+    EVIDENCE_PER_FRAGMENT_CHARS / EVIDENCE_MAX_CHARS)."""
+    per_frag = int(per_fragment if per_fragment is not None else PER_FRAGMENT_CHARS)
+    budget = int(max_chars if max_chars is not None else MAX_EVIDENCE_CHARS)
     parts, total = [], 0
     verify_src = []
     for i, chunk in enumerate(chunks, 1):
-        fragment = str(chunk.get("text_ctx", chunk.get("text", "")))[:PER_FRAGMENT_CHARS]
-        if total + len(fragment) > MAX_EVIDENCE_CHARS:
+        fragment = str(chunk.get("text_ctx", chunk.get("text", "")))[:per_frag]
+        if total + len(fragment) > budget:
             break
         parts.append(f'<fragment id="c{i}">\n{fragment}\n</fragment>')
         verify_src.append(fragment)
@@ -262,7 +269,10 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
 
     notes = temporal.reason_notes(_temporal_text(dialog, queries),
                                   ctx.get("docs") or [], chunks)
-    prompt, evidence_src = _evidence_bundle(chunks, notes)
+    prompt, evidence_src = _evidence_bundle(
+        chunks, notes,
+        per_fragment=cfg.evidence_per_fragment_chars,
+        max_chars=cfg.evidence_max_chars)
     if client is None or time.time() > deadline:
         return extractive_fallback(question, ctx, chunks)
 

@@ -82,6 +82,8 @@ class Config:
     request_timeout_s: float = 45.0     # тайм-аут вызова API: 30–45 с (§2.5)
     model_from_env: bool = False        # модель реально задана в env (не локальный дефолт)
     t5_premise_gate: bool = False       # гейт ложных предпосылок: T5_GATE=1 (после калибровки)
+    evidence_per_fragment_chars: int = 2_000   # обрезка одного фрагмента (§9.2)
+    evidence_max_chars: int = 6_000            # бюджет всего evidence (§9.2)
 
     @property
     def api_ready(self) -> bool:
@@ -123,6 +125,8 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         temperature=0.0,  # форсировано: детерминизм ответа (§12.2)
         model_from_env=bool(llm_model_raw),
         t5_premise_gate=_bool_flag(env.get("T5_GATE"), False),
+        evidence_per_fragment_chars=clamp_int(env.get("EVIDENCE_PER_FRAGMENT_CHARS"), 200, 4000, 2000),
+        evidence_max_chars=clamp_int(env.get("EVIDENCE_MAX_CHARS"), 1000, 24000, 6000),
     )
 
 
