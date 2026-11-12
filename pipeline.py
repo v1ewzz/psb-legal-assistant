@@ -44,9 +44,11 @@ NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
 T1_TRAP_RE = re.compile(r"90\s+календарн", re.I)
 MARKDOWN_RE = re.compile(r"[*_#`]+")
 # период/единица рядом с числом: «450 000 рублей в неделю» при «…в месяц» в базе
+# (?<![а-яёА-ЯЁ]) — стем не внутри слова («Однако»), час(?!т) — не «части»
 PERIOD_UNIT_RE = re.compile(
-    r"(\d+(?:[.,]\d+)?)[^.!?]{0,25}?(в |за |)(недел\w+|месяц\w+|год\w+|дн\w+|"
-    r"календарн\w+|рабоч\w+|час\w+)", re.I)
+    r"(\d+(?:[.,]\d+)?)[^.!?]{0,25}?(?:в |за |)?"
+    r"(?<![а-яёА-ЯЁ])(недел\w+|месяц\w+|год\w+|дн\w*|календарн\w+|рабоч\w+|"
+    r"час(?!т)\w*)\b", re.I)
 
 
 def _normalize_numbers(text: str) -> str:
@@ -123,7 +125,7 @@ def _unit_trap(answer: str, evidence_text: str) -> Optional[str]:
     ev_norm = re.sub(r"\s+", "", ev_flat).replace(",", ".")
     for m in PERIOD_UNIT_RE.finditer(ans_flat):
         num = re.sub(r"\s", "", m.group(1).replace(",", "."))
-        unit = m.group(3).lower()[:4]
+        unit = m.group(2).lower()[:4]
         # число+единица рядом в evidence?
         ok = re.search(
             rf"(?<![\d.,]){re.escape(num)}[^.!?]{{0,25}}?{re.escape(unit)}",
@@ -331,7 +333,9 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
             answer = client.chat(
                 [{"role": "system", "content": SYSTEM_PROMPT},
                  {"role": "user", "content": user}],
-                max_tokens=min(cfg.max_tokens, 1500),
+                max_tokens=min(cfg.max_tokens, 4000),
+                # 4000: reasoning-модели тратят сотни токенов до content;
+                # низкий потолок → обрезанный ответ → ретрай → фолбэк
             )
         except ApiError as e:
             last_error = str(e)

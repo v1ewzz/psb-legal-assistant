@@ -83,12 +83,13 @@ def score_answer(answer: str, gold: str, question: str) -> dict:
     missing = sorted(k for k in g_keys if k not in a_keys)
     numbers_ok = None if not g_keys else not missing
 
-    g_units = {u.lower()[:4] for u in re.findall(
-        r"\d+(?:[.,]\d+)?[^\n.]{0,20}?(в |за |)(недел\w+|месяц\w+|год\w+|"
-        r"дн\w+|календарн\w+|рабоч\w+|час\w+)", g_norm, re.I)}
-    a_units = {u.lower()[:4] for u in re.findall(
-        r"\d+(?:[.,]\d+)?[^\n.]{0,20}?(в |за |)(недел\w+|месяц\w+|год\w+|"
-        r"дн\w+|календарн\w+|рабоч\w+|час\w+)", a_norm, re.I)}
+    def units_of(text: str) -> set[str]:
+        return {m.group(2).lower()[:4] for m in re.finditer(
+            r"(\d+(?:[.,]\d+)?)[^\n.]{0,20}?(?:в |за |)?"
+            r"(?<![а-яёА-ЯЁ])(недел\w+|месяц\w+|год\w+|дн\w*|календарн\w+|"
+            r"рабоч\w+|час(?!т)\w*)\b", text, re.I)}
+
+    g_units, a_units = units_of(g_norm), units_of(a_norm)
     units_ok = None if not g_units else g_units <= a_units
 
     g_refs = set(REF_RE.findall(g_norm))

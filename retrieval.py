@@ -232,6 +232,9 @@ class Retriever:
         order = [idx for _, idx in candidates[:max(top_n * 3, 24)]]
         if not order:
             return []
+        rrf_order = list(order)   # исходный RRF-порядок: sibling-fill сканирует его,
+        # а не реранк-мерж — реранк двигает чанки и сдвигает окно сиблингов
+        # мимо нужного пункта (регресс Q6/Q15 26.199)
 
         # реранк (§9.1.6): query = standalone, документы = text_ctx.
         # Страховка от слабого реранкера/клампа прокси: BM25-топ-2 остаётся
@@ -254,12 +257,13 @@ class Retriever:
         # и до какого числа») держат оба факта в соседних пунктах одного
         # договора; срез топ-N систематически терял второй факт (ранги 10-12).
         # SIBLING_FILL=0 — выключить (бисекция; факт-покрытие падает до 93%).
-        sibling_extra = 4
+        sibling_extra = 10  # Q15: п. 6.3 RRF-ранг 18 («ключи» vs «возвращает по акту»);
+        # чанки ~200 симв., бюджет 6000 вмещает ~20 — окно до топ-24 целиком
         if (_sibling_fill_enabled() and len(selected) >= top_n
-                and len(order) > top_n):
+                and len(rrf_order) > top_n):
             core_docs = {c["doc_id"] for c in selected}
             have = {c["chunk_id"] for c in selected}
-            for i in order[top_n:]:
+            for i in rrf_order[top_n:]:
                 if len(selected) >= top_n + sibling_extra:
                     break
                 chunk = self.chunks[i]

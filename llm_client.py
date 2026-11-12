@@ -301,7 +301,9 @@ class LlmClient:
         t0 = time.monotonic()
         try:
             result["llm_ok"] = bool(self.chat(
-                [{"role": "user", "content": "ping"}], max_tokens=5, temperature=0.0
+                [{"role": "user", "content": "ping"}], max_tokens=64, temperature=0.0
+                # 64: reasoning-модели (deepseek-v4.1) тратят токены на
+                # reasoning до content — проба с 5 токенами давала «пусто»
             ).strip())
         except ApiError as e:
             result["warnings"].append(f"llm: {e}")
