@@ -26,6 +26,7 @@ import numpy as np
 from config import Config, EMBED_BATCH_SIZE
 
 RETRYABLE_STATUS = {429, 500, 502, 503, 504}
+_BREAKER_THRESHOLD = 3          # подряд сетевых сбоев → считаем API умершим
 
 # Замыкание: JSON-реплей с предохранителями §17.4-Мок-мода на пинги. Замыкание: json
 
@@ -120,6 +121,7 @@ class LlmClient:
         self.pause_s = pause_s
         self.max_retries = max_retries  # 1–2 ретрая §2.5; 0 — для тайм-аут-тестов
         self.stats = {"chat": 0, "embed_calls": 0, "rerank": 0, "retries": 0}
+        self._fail_streak = 0           # сетевые сбои подряд (circuit breaker)
         self._http = httpx.Client(
             base_url=cfg.base_url,
             timeout=cfg.request_timeout_s if timeout_s is None else timeout_s,
@@ -140,6 +142,11 @@ class LlmClient:
     def _post_retry(self, path: str, payload: dict, api_key: str,
                     retries: Optional[int] = None) -> dict:
         retries = self.max_retries if retries is None else max(0, retries)
+        # Circuit breaker: 3 подряд сетевых сбоя → API считает умершим,
+        # вызовы падают сразу без тайм-аутов (берегём дедлайн 16 мин, §16.3).
+        if self._fail_streak >= _BREAKER_THRESHOLD:
+            raise ApiError(f"{path}: circuit breaker открыт после "
+                           f"{self._fail_streak} подряд сетевых сбоев")
         last_exc: Optional[BaseException] = None
         for attempt in range(retries + 1):
             if attempt:
@@ -165,9 +172,11 @@ class LlmClient:
                         f"{path}: HTTP {resp.status_code}: {resp.text[:200]}",
                         status=resp.status_code,
                     )
+                self._fail_streak = 0
                 return resp.json()
             except (httpx.TimeoutException, httpx.NetworkError) as e:
                 last_exc = e
+                self._fail_streak += 1
                 continue  # ретрай на сетевых сбоях
         if isinstance(last_exc, httpx.TimeoutException) or (
             isinstance(last_exc, httpx.NetworkError)
@@ -189,6 +198,8 @@ class LlmClient:
                 for m in messages
             ],
             "temperature": self.cfg.temperature if temperature is None else temperature,
+            "top_p": 0.3,        # доп. детерминизм к temperature=0 (§12.2)
+            "seed": 42,          # фиксированный seed: повторяемость прогона
             "max_tokens": self.cfg.max_tokens if max_tokens is None
             else min(max_tokens, self.cfg.max_tokens),
         }

@@ -84,6 +84,7 @@ class Config:
     t5_premise_gate: bool = False       # гейт ложных предпосылок: T5_GATE=1 (после калибровки)
     evidence_per_fragment_chars: int = 2_000   # обрезка одного фрагмента (§9.2)
     evidence_max_chars: int = 6_000            # бюджет всего evidence (§9.2)
+    max_input_chars: int = 4_000               # кламп ячейки вопроса (§2.2)
 
     @property
     def api_ready(self) -> bool:
@@ -127,6 +128,7 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         t5_premise_gate=_bool_flag(env.get("T5_GATE"), False),
         evidence_per_fragment_chars=clamp_int(env.get("EVIDENCE_PER_FRAGMENT_CHARS"), 200, 4000, 2000),
         evidence_max_chars=clamp_int(env.get("EVIDENCE_MAX_CHARS"), 1000, 24000, 6000),
+        max_input_chars=clamp_int(env.get("MAX_INPUT_CHARS"), 500, 20000, 4000),
     )
 
 
