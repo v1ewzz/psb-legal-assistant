@@ -13,6 +13,7 @@ import guard
 
 import config
 import ingest
+import numpy as np
 import pipeline
 import temporal
 from config import Config
@@ -338,6 +339,62 @@ def test_max_input_chars_clamped_in_from_env():
     assert cfg.max_input_chars == 20000  # верхний кламп
     cfg2 = config.from_env({})
     assert cfg2.max_input_chars == 4000
+
+
+# --- Dense-канал: механика фьюжна на мок-векторах (без API) ---
+
+def _dense_retriever(real_ctx):
+    chunks = real_ctx["retriever"].chunks
+    return Retriever(chunks, find_artifact(real_ctx["cfg"], "bm25.index.npz"))
+
+
+def test_dense_fusion_promotes_synonym_chunk(real_ctx):
+    """Dense-голос поднимает чанк, который BM25 не нашёл в топ-8."""
+    retr = _dense_retriever(real_ctx)
+    n = len(retr.chunks)
+    # случайные почти-ортогональные вектора
+    rng = np.random.default_rng(42)
+    mat = rng.normal(size=(n, 8))
+    mat /= np.linalg.norm(mat, axis=1, keepdims=True)
+    dense_retr = Retriever(retr.chunks,
+                           find_artifact(real_ctx["cfg"], "bm25.index.npz"),
+                           dense=mat)
+    # вектор «прицелен» в чанк, слабый по BM25
+    q = "проверка качества товара поставки"
+    base = [c["chunk_id"] for c in dense_retr.search([q], top_n=8)]
+    # чанк с самым слабым BM25-скором
+    weak = dense_retr.search([q], top_n=8, top_k=24)
+    # возьмём какой-нибудь чанк вне base и прицелимся в него
+    all_ids = [c["chunk_id"] for c in retr.chunks]
+    outside = [i for i, cid in enumerate(all_ids) if cid not in base]
+    assert outside, "нет чанков вне выдачи"
+    target = outside[0]
+    qv = mat[target]
+    boosted = [c["chunk_id"] for c in dense_retr.search(
+        [q], top_n=8, query_vec=qv)]
+    assert all_ids[target] in boosted
+
+
+def test_dense_shape_mismatch_degrades_to_bm25(real_ctx):
+    """Рассинхрон размеров dense-матрицы → BM25-only, без падения."""
+    retr = _dense_retriever(real_ctx)
+    dense_retr = Retriever(retr.chunks,
+                           find_artifact(real_ctx["cfg"], "bm25.index.npz"),
+                           dense=np.zeros((5, 8)))
+    assert dense_retr.dense is None
+    out = dense_retr.search(["арендная плата"], top_n=8)
+    assert out
+
+
+def test_dense_query_vec_none_is_safe(real_ctx):
+    """query_vec=None при dense-канале → чистый BM25, без ошибок."""
+    retr = _dense_retriever(real_ctx)
+    mat = np.eye(len(retr.chunks), 4)
+    dense_retr = Retriever(retr.chunks,
+                           find_artifact(real_ctx["cfg"], "bm25.index.npz"),
+                           dense=mat)
+    out = dense_retr.search(["арендная плата"], top_n=8, query_vec=None)
+    assert out
 
 
 def test_answer_one_no_llm_extractive_fallback(real_ctx):

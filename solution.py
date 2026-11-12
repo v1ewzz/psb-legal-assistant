@@ -72,6 +72,7 @@ def load_context() -> dict:
             except Exception as e:
                 print(f"Пересборка индекса не удалась: {type(e).__name__}", file=sys.stderr)
     retriever = None
+    dense = None
     if chunks:
         bm25_path = find_artifact(cfg, "bm25.index.npz")
         refs_path = find_artifact(cfg, "refs.json")
@@ -89,6 +90,7 @@ def load_context() -> dict:
             print(f"docs.json не читается: {type(e).__name__}", file=sys.stderr)
     client = LlmClient(cfg) if cfg.api_ready else None
     rerank_ok = False
+    probe: dict = {}
     if client is not None:
         # пробы старта ≤30 с (§16.3): короткий тайм-аут, без ретраев
         probe_client = LlmClient(cfg, timeout_s=10, max_retries=0)
@@ -96,19 +98,85 @@ def load_context() -> dict:
             probe = probe_client.probe_all()
             rerank_ok = bool(probe.get("rerank_ok"))
             print(f"Пробы: llm={'ок' if probe.get('llm_ok') else 'нет'}; "
+                  f"embed={'ок' if probe.get('emb_ok') else 'нет'}; "
                   f"rerank={'ок' if rerank_ok else 'нет'}; "
                   f"{probe.get('elapsed_s', '?')} с", file=sys.stderr)
         except Exception as e:
             print(f"Пробы не удались: {type(e).__name__}", file=sys.stderr)
         finally:
             probe_client.close()
+        # Dense-канал: эмбеддинги чанков (гибрид BM25+dense, §9.1.4).
+        # Тайм-бокс 90 с; кэш index/embeddings.npz с именем модели; любой
+        # сбой → деградация BM25-only (§8.3).
+        if retriever is not None and probe.get("emb_ok") and _bool_flag_env(cfg, "DENSE", True):
+            dense = _build_dense(cfg, retriever, client, T0)
     print(f"Контекст: чанков={len(chunks) if chunks else 0}; "
           f"bm25={'да' if retriever else 'нет'}; "
+          f"dense={'да' if dense is not None else 'нет'}; "
           f"llm={'да' if client else 'нет'}; "
           f"rerank={'да' if rerank_ok else 'нет'}; "
           f"режим={cfg.llm_model}", file=sys.stderr)
     return {"cfg": cfg, "retriever": retriever, "client": client,
             "docs": docs, "rerank_ok": rerank_ok}
+
+
+def _bool_flag_env(cfg: config.Config, name: str, default: bool) -> bool:
+    """Мини-флаг без заезда в Config (DENSE=0 для локальных A/B)."""
+    import os
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on", "да"}
+
+
+DENSE_TIMEBOX_S = 90.0
+
+
+def _build_dense(cfg: config.Config, retriever: Retriever,
+                 client: LlmClient, t0: float):
+    """Матрица эмбеддингов всех чанков: кэш index/embeddings.npz (проверяем
+    имя модели и число чанков), иначе батчи по 64 в тайм-боксе; L2-нормализация."""
+    import numpy as np
+    cache_path = Path("index") / "embeddings.npz"
+    model = cfg.emb_model
+    if cache_path.is_file():
+        try:
+            payload = np.load(cache_path, allow_pickle=False)
+            if (str(payload["model"][0]) == model
+                    and payload["vecs"].shape[0] == len(retriever.chunks)):
+                print("dense: кэш embeddings.npz использован", file=sys.stderr)
+                return payload["vecs"]
+        except Exception:
+            pass
+    n = len(retriever.chunks)
+    vecs: list = []
+    try:
+        for start in range(0, n, 64):
+            if time.time() - t0 > DENSE_TIMEBOX_S:
+                print(f"dense: тайм-бокс исчерпан на {start}/{n} — деградация BM25",
+                      file=sys.stderr)
+                return None
+            batch = [t[:4000] for t in retriever._texts[start:start + 64]]
+            v = client.embed(batch)
+            vecs.append(v)
+        if not vecs:
+            return None
+    except Exception as e:
+        print(f"dense: эмбеддинги не удались ({type(e).__name__}) — BM25-only",
+              file=sys.stderr)
+        return None
+    try:
+        mat = np.vstack(vecs)
+        norms = np.linalg.norm(mat, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        mat = mat / norms
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez(cache_path, vecs=mat, model=np.array([model]))
+        print(f"dense: {mat.shape[0]}x{mat.shape[1]} построено", file=sys.stderr)
+    except Exception as e:
+        print(f"dense: сохранение не удалось: {type(e).__name__}", file=sys.stderr)
+        return None
+    return mat
 
 
 def main() -> None:

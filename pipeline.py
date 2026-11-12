@@ -277,6 +277,18 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
     client: Optional[LlmClient] = ctx.get("client")
     time_left = deadline - time.time()
 
+    # Dense-канал: вектор запроса (1 вызов embed); сбой → BM25-only (§8.3)
+    query_vec = None
+    if retriever.dense is not None and client is not None and time_left > 30:
+        try:
+            vecs = client.embed([standalone[: cfg.max_input_chars]])
+            import numpy as np
+            v = np.asarray(vecs[0], dtype="float64")
+            norm = float(np.linalg.norm(v))
+            query_vec = v / norm if norm > 0 else None
+        except Exception as e:
+            print(f"dense: запрос не векторизован: {type(e).__name__}", file=sys.stderr)
+
     # Тир по бюджету: без реранка, если время поджимает или fast_mode (U8)
     use_rerank = bool(client is not None and ctx.get("rerank_ok")
                       and not ctx.get("fast_mode") and time_left > 60)
@@ -292,6 +304,7 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
         drop_doc_ids=filters.get("drop_doc_ids"),
         boost_doc_ids=filters.get("boost_doc_ids"),
         deadline=deadline,
+        query_vec=query_vec,
     )
     if not chunks:
         return grounded_refusal(question, ctx)

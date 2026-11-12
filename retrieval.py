@@ -29,6 +29,7 @@ from ingest import QUERY_REF_RE, normalize_text, tokenize_ru
 CHUNK_FIELDS = ("chunk_id", "doc_id", "short_name", "path", "text", "text_ctx")
 
 RRF_K = 60
+DENSE_WEIGHT = 1.0           # вес dense-голоса в RRF (BM25: по 1.0 на запрос)
 BOOST_REF_SCORE = 0.05       # doc-boost: выше любого одиночного RRF-ранга
 RERANK_DOC_CHARS = 2200      # обрезка text_ctx для вызова реранка
 PUNKT_QUERY_RE = re.compile(r"\bп\.\s*(\d+(?:\.\d+)?)", re.I)
@@ -70,11 +71,16 @@ def load_chunks(cfg: Config) -> list[dict]:
 class Retriever:
     """BM25 по text_ctx + RRF по нескольким запросам + exact-ref boost (§9)."""
 
-    def __init__(self, chunks: Sequence[dict], bm25_npz: Path, refs: Optional[dict] = None):
+    def __init__(self, chunks: Sequence[dict], bm25_npz: Path, refs: Optional[dict] = None,
+                 dense: Optional[ndarray] = None):
         self.chunks = list(chunks)
         if not self.chunks:
             raise ValueError("пустой индекс чанков")
         self._texts = [c["text_ctx"] for c in self.chunks]
+        # dense-канал: (n_chunks, dim), L2-нормализовано; рассинхрон → деградация BM25
+        self.dense = dense
+        if dense is not None and (getattr(dense, "shape", (0,))[0] != len(self.chunks)):
+            self.dense = None
         payload = np.load(bm25_npz, allow_pickle=False)
         token_pattern = str(payload["token_pattern"][0])
         if token_pattern != "custom_ru_v2":
@@ -170,7 +176,8 @@ class Retriever:
                rerank_query: Optional[str] = None, client=None,
                top_n: int = 8, drop_doc_ids: Optional[set] = None,
                boost_doc_ids: Optional[set] = None,
-               deadline: Optional[float] = None) -> list[dict]:
+               deadline: Optional[float] = None,
+               query_vec: Optional[ndarray] = None) -> list[dict]:
         """Мульти-запрос → RRF → ref-boost → фильтры → реранк → топ-N (§9)."""
         if isinstance(queries, str):
             queries = [queries]
@@ -180,6 +187,18 @@ class Retriever:
         for query in queries:
             for rank, idx in enumerate(self._bm25_ranked(query, top_k)):
                 rrf[idx] = rrf.get(idx, 0.0) + 1.0 / (RRF_K + rank + 1)
+
+        # Dense-голос: cosine по эмбеддингам чанков — синонимы и перефразы,
+        # которых нет у BM25 (§9.1.4 гибрид). Сбой → тихая деградация BM25.
+        if self.dense is not None and query_vec is not None:
+            try:
+                sims = self.dense @ query_vec
+                order_d = np.argsort(-sims)[:top_k]
+                for rank, idx in enumerate(order_d):
+                    if float(sims[idx]) > 0.15:  # нули/мусор не голосуют
+                        rrf[idx] = rrf.get(idx, 0.0) + DENSE_WEIGHT / (RRF_K + rank + 1)
+            except Exception as e:
+                print(f"dense-фьюжн недоступен: {type(e).__name__}", file=sys.stderr)
 
         drop_doc_ids = drop_doc_ids or set()
         boost_doc_ids = boost_doc_ids or set()
