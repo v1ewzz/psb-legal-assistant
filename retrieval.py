@@ -103,6 +103,10 @@ class Retriever:
                         hits.add(doc_id)
         return hits
 
+    def ref_doc_hits(self, question: str) -> set[str]:
+        """E-фикс: документы, прямо упомянутые в вопросе (анти-переотказ)."""
+        return self._ref_doc_ids(normalize_text(question))
+
     def search(self, question: str, top_k: int) -> list[dict]:
         """→ [{...chunk}] в порядке релевантности, doc-boost вне конкуренции.
 

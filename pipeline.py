@@ -38,6 +38,7 @@ NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
 T1_TRAP_RE = re.compile(r"90\s+календарн", re.I)
 MARKDOWN_RE = re.compile(r"[*_#`]+")
 USER_TURN_SPLIT_RE = re.compile(r"(?=Пользователь:\s)", re.I)
+REFUSAL_PAT_RE = re.compile(r"нет документов|не могу|не удалось|нет сведений", re.I)
 
 # B-lite (D3-lite): многокомпонентные пункты «п. 3.1», №-реквизиты, «N-ФЗ».
 # Односоставные («ст. 70», «п. 9») не проверяем — нулевой порог ложных срабатываний
@@ -88,16 +89,22 @@ def _evidence_bundle(chunks: list[dict]) -> tuple[str, str]:
     return "\n\n".join(parts), "".join(verify_src)
 
 
-def _verify_lite(answer: str, evidence_text: str) -> Optional[str]:
-    """None — ок; строка — причина провала (для одного ретрая §13.1 упрощённо)."""
+def _verify_lite(answer: str, evidence_text: str,
+                 allowed_numbers: Optional[set[str]] = None) -> Optional[str]:
+    """None — ок; строка — причина провала (для одного ретрая §13.1 упрощённо).
+
+    allowed_numbers: числа-исключения (нормализованные: «4500»), легитимные
+    вне evidence — результаты calc-note (C-фикс), иначе арифметика T12
+    роняла бы верный расчёт в fallback."""
     if not answer.strip():
         return "модель вернула пустой ответ"
     if T1_TRAP_RE.search(answer) and "90" not in _normalize_numbers(evidence_text):
         return "ответ повторяет строку-инъекцию «90 календарных дней» (T1)"
+    allowed = {a for a in (allowed_numbers or set())}
     haystack = _normalize_numbers(evidence_text)
     for raw in NUM_RE.findall(answer):
         number = raw.replace(",", ".").lstrip("0") or "0"
-        if len(raw) < 2:  # частицы «-1» и пункты не проверяем в v1
+        if len(raw) < 2 or number in allowed:  # частицы «-1» и пункты не проверяем в v1
             continue
         if number not in haystack.replace(",", "."):
             return f"число из ответа не найдено в evidence: «{raw}»"
@@ -124,6 +131,80 @@ def _citation_problem(answer: str, evidence_text: str, question: str) -> Optiona
     return None
 
 
+PENYA_WORD_RE = re.compile(r"пени|неустойк|просрочк", re.I)
+PENYA_RATE_RE = re.compile(
+    r"(\d+(?:[.,]\d+)?)\s*(?:%|процент\w*)\s*"
+    r"(?:в\s*день|в\s*сутк|за\s*(?:каждый|каждое)?\s*дн?)", re.I)
+DAYS_LATE_RE = re.compile(r"(\d+)\s*(?:(?:календарн\w+|рабоч\w+|банковск\w+)\s+)?дн\w*", re.I)
+MONEY_Q_RE = re.compile(r"(\d[\d\u00a0 ]{2,}\d|\d+)\s*(?:руб|₽)", re.I)
+MONEY_BARE_RE = re.compile(r"\d[\d\u00a0 ]{3,}\d")
+
+
+def _fmt_money(x: float) -> str:
+    """4500 → «4 500»; 1234.5 → «1 234,5» — как в эталонах."""
+    if abs(x - round(x)) < 0.005:
+        s = str(int(round(x)))
+    else:
+        head, tail = f"{x:.2f}".rstrip("0").rstrip(".").replace(".", ",").split(",")
+        return re.sub(r"\B(?=(\d{3})+(?!\d))", " ", head) + "," + tail
+    return re.sub(r"\B(?=(\d{3})+(?!\d))", " ", s)
+
+
+def calc_note(question: str, evidence_text: str) -> tuple[Optional[str], set[str]]:
+    """C-фикс (T12): арифметика пени = сумма × ставка%/день × дни просрочки.
+
+    Гейт срабатывания строгий: вопрос про пени/неустойку/просрочку, ставка
+    «N% в день» найдена во фрагментах, сумма и дни — в вопросе. Результат —
+    <note> с формулой (LLM только вставляет готовое число); числа из note
+    уходят в whitelist verify, иначе вычисленное число роняло ответ в
+    fallback. Даты по рабочим дням НЕ считаем (только «N дней» — §специфики).
+    """
+    if not PENYA_WORD_RE.search(question):
+        return None, set()
+    rate_m = PENYA_RATE_RE.search(evidence_text)
+    if rate_m is None:
+        return None, set()
+    rate = float(rate_m.group(1).replace(",", "."))
+    if not 0.001 <= rate <= 10:  # пени-ставки малы; «12% в день» — другой класс
+        return None, set()
+    days_m = DAYS_LATE_RE.search(question)
+    if days_m is None:
+        return None, set()
+    days = int(days_m.group(1))
+    if not 1 <= days <= 3650:
+        return None, set()
+    # сумма: приоритет «N руб/₽»; иначе голое ≥4-значное (кроме годов/дат)
+    money_m = None
+    for m in MONEY_Q_RE.finditer(question):
+        money_m = m
+    if money_m is None:
+        for m in MONEY_BARE_RE.finditer(question):
+            value = float(re.sub(r"[\u00a0 ]", "", m.group()))
+            if 1900 <= value <= 2100:  # год/номер редакции — не сумма
+                continue
+            money_m = m
+    if money_m is None:
+        return None, set()
+    amount = float(re.sub(r"[\u00a0 ]", "", money_m.group(1).replace(",", ".")))
+    if amount <= 0:
+        return None, set()
+    peni = amount * rate / 100.0 * days
+    if peni < 0.01:
+        return None, set()
+    peni_digits = (str(int(round(peni))) if abs(peni - round(peni)) < 0.005
+                   else f"{peni:.2f}".rstrip("0").rstrip("."))
+    note = (f"<note>Расчёт пени по данным вопроса: {_fmt_money(amount)} × "
+            f"{rate_m.group(1)}% в день × {days} дн. = {_fmt_money(peni)}. "
+            f"Если во фрагментах есть условия о пени за просрочку — используй "
+            f"это число и приведи расчёт кратко.</note>")
+    # whitelist: результат явно + все числа note (сумма/ставка/дни — из вопроса
+    # и фрагментов) в нормализованном виде _verify_lite
+    allowed = {peni_digits}
+    allowed |= {r.replace(",", ".").lstrip("0") or "0"
+                for r in NUM_RE.findall(note) if len(r) >= 2}
+    return note, allowed
+
+
 def _finalize(answer: str) -> str:
     """Одна строка, без маркдауна, ≤10 000 символов (§4.1, §15.3 упрощённо)."""
     text = MARKDOWN_RE.sub("", answer)
@@ -133,15 +214,11 @@ def _finalize(answer: str) -> str:
     return text
 
 
-def premise_correction(question: str, chunks: list[dict]) -> Optional[str]:
-    """Ложная предпосылка в числе (T5): «плата 500 000» → шаблон §4.2.
-
-    Строгие условия срабатывания (иначе молчим — см. калибровку 27→19):
-    - число в вопросе ≥6 цифр (годы «2024» не триггерят);
-    - число отсутствует в evidence целиком;
-    - в найденных чанках есть число ТОЙ ЖЕ разрядности в денежном/множественном
-      контексте (руб/₽/мес/млн) — иначе это просто другой вопрос, лезем молча.
-    """
+def _premise_mismatch(question: str, chunks: list[dict]):
+    """Детекция ложной предпосылки (T5/T6): число ≥6 цифр из вопроса, которого
+    нет в evidence, при наличии числа той же разрядности в денежном/процентном
+    контексте. → (display, digits, cand, chunk, sentence, item) | None.
+    Общий хелпер для гейта T5 и premise-note (D-фикс)."""
     flat_question = question.replace("\u00a0", " ")
     ev_flat = "".join(str(c["text"]) for c in chunks).replace("\u00a0", " ")
     ev_norm = re.sub(r"\s+", "", ev_flat).replace(",", ".")
@@ -162,15 +239,44 @@ def premise_correction(question: str, chunks: list[dict]) -> Optional[str]:
                 sentence, item = _sentence_with_number(str(chunk["text"]), cand)
                 if item is None:
                     continue
-                where = chunk.get("short_name", "?")
-                ref = f"(п. {item})" if item else ""
-                claim = _truncate_sentence(sentence, 180)
-                return _finalize(
-                    f"В {where} указано {claim} {ref}, а не {m.group()} — "
-                    f"числа {raw} в найденных документах нет."
-                )
+                return m.group(), raw, cand, chunk, sentence, item
         break  # первая же неподтверждённая цифра вопроса → обычный конвейер
     return None
+
+
+def premise_correction(question: str, chunks: list[dict]) -> Optional[str]:
+    """Ложная предпосылка в числе (T5): «плата 500 000» → шаблон §4.2.
+
+    Строгие условия срабатывания (иначе молчим — см. калибровку 27→19):
+    детекция в _premise_mismatch; включается флагом T5_GATE."""
+    hit = _premise_mismatch(question, chunks)
+    if hit is None:
+        return None
+    display, raw, _cand, chunk, sentence, item = hit
+    where = chunk.get("short_name", "?")
+    ref = f"(п. {item})" if item else ""
+    claim = _truncate_sentence(sentence, 180)
+    return _finalize(
+        f"В {where} указано {claim} {ref}, а не {display} — "
+        f"числа {raw} в найденных документах нет."
+    )
+
+
+def premise_note_text(question: str, chunks: list[dict]) -> Optional[str]:
+    """D-фикс: расхождение предпосылки → <note> в evidence, а не шаблонный ответ.
+
+    Гейт T5 рисковал стилем (шаблон проигрывает эталону); note же оставляет
+    формулировку Reason'у — он поправит число в стиле эталона (урок 27→19)."""
+    hit = _premise_mismatch(question, chunks)
+    if hit is None:
+        return None
+    display, raw, cand, chunk, _sentence, item = hit
+    where = chunk.get("short_name", "?")
+    ref = f" (п. {item})" if item else ""
+    return (f"<note>В вопросе указано «{display}», но в {where}{ref} указано "
+            f"«{cand}». Числа {raw} в найденных документах нет. Если фрагменты "
+            f"относятся к вопросу — ответь по документам, аккуратно исправив "
+            f"число в предпосылке.</note>")
 
 
 def _sentence_with_number(chunk_text: str, number_with_spaces: str) -> tuple[str, Optional[str]]:
@@ -232,11 +338,25 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
             return correction
 
     prompt, evidence_src = _evidence_bundle(chunks)
+    # Заметки C/D: арифметика пени и расхождение предпосылки → <note> в
+    # evidence; числа note уходят в whitelist verify (иначе расчёт ронялся
+    # в fallback). Гейт T5 и note взаимоисключающие — note не спорит с шаблоном.
+    calc_allowed: set[str] = set()
+    if cfg.premise_note and not cfg.t5_premise_gate:
+        note = premise_note_text(question, chunks)
+        if note:
+            prompt += "\n\n" + note
+    if cfg.calc_note:
+        note, allowed = calc_note(question, evidence_src)
+        if note:
+            prompt += "\n\n" + note
+            calc_allowed |= allowed
     client: Optional[LlmClient] = ctx.get("client")
     if client is None:
         return extractive_fallback(question, ctx, chunks)
     if time.time() > deadline:
         return extractive_fallback(question, ctx, chunks)
+    ref_docs = retriever.ref_doc_hits(question) if cfg.refusal_retry else set()
 
     last_error = "unknown"
     for attempt in range(2):  # §13.1: регенерация максимум 1 раз
@@ -251,12 +371,21 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
             last_error = str(e)
             print(f"LLM недоступна: {last_error}", file=sys.stderr)
             break
-        problem = _verify_lite(answer, evidence_src)
+        problem = _verify_lite(answer, evidence_src, calc_allowed)
         hard = problem is not None
         if problem is None and cfg.citation_lint:
             problem = _citation_problem(answer, evidence_src, question)
         if problem is None:
-            return _finalize(answer)
+            final = _finalize(answer)
+            if (cfg.refusal_retry and attempt == 0 and ref_docs
+                    and REFUSAL_PAT_RE.search(final)):
+                # E-фикс: переотказ при exact-ref попадании — один ретрай с подсказкой
+                prompt = ("⚠ Ты отказался отвечать, но среди фрагментов есть "
+                          "положения по теме вопроса. Перечитай их и ответь по "
+                          "существу, если данные позволяют; отказывайся, только "
+                          "если данных действительно нет.\n" + prompt)
+                continue
+            return final
         if not hard and attempt == 1:
             # B-lite не роняет ответ в фолбэк: числа подтверждены, претензия
             # только к ссылке — после одного ретрая принимаем как есть.
