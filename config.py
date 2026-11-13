@@ -81,8 +81,9 @@ class Config:
     model_from_env: bool = False        # модель реально задана в env (не локальный дефолт)
     t5_premise_gate: bool = False       # гейт ложных предпосылок: T5_GATE=1 (после калибровки)
     max_input_chars: int = 4000         # кламп ячейки вопроса; хвост (последняя реплика) сохраняется
-    citation_lint: bool = False         # B-lite: сверка ссылок ответа с фрагментами (CITATION_LINT=1)
-    sibling_fill: bool = False          # добор +2 сиблинга того же документа (SIBLING_FILL=1)
+    citation_lint: bool = True          # B-lite: сверка ссылок с фрагментами (на демо инертен,
+                                        # фантомные ссылки ловит; в фолбэк не роняет — 1 ретрай)
+    sibling_fill: bool = True           # добор +2 сиблинга того же документа (eval: 0.65→0.71-0.73)
 
     @property
     def api_ready(self) -> bool:
@@ -125,8 +126,8 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         model_from_env=bool(llm_model_raw),
         t5_premise_gate=_bool_flag(env.get("T5_GATE"), False),
         max_input_chars=clamp_int(env.get("MAX_INPUT_CHARS"), 500, 16000, 4000),
-        citation_lint=_bool_flag(env.get("CITATION_LINT"), False),
-        sibling_fill=_bool_flag(env.get("SIBLING_FILL"), False),
+        citation_lint=_bool_flag(env.get("CITATION_LINT"), True),
+        sibling_fill=_bool_flag(env.get("SIBLING_FILL"), True),
     )
 
 
