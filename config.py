@@ -87,6 +87,7 @@ class Config:
     calc_note: bool = False             # C: расчёт пени в <note> + whitelist verify (CALC_NOTE=1)
     premise_note: bool = False          # D: расхождение предпосылки в <note> (PREMISE_NOTE=1)
     refusal_retry: bool = False         # E: ретрай при переотказе с exact-ref (REFUSAL_RETRY=1)
+    missing_norm: bool = False          # D4: заметка о частичном покрытии норм (MISSING_NORM=1)
 
     @property
     def api_ready(self) -> bool:
@@ -134,6 +135,7 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         calc_note=_bool_flag(env.get("CALC_NOTE"), False),
         premise_note=_bool_flag(env.get("PREMISE_NOTE"), False),
         refusal_retry=_bool_flag(env.get("REFUSAL_RETRY"), False),
+        missing_norm=_bool_flag(env.get("MISSING_NORM"), False),
     )
 
 

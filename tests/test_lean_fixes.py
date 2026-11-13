@@ -11,8 +11,8 @@ def _dialog(n_turns: int) -> str:
     return "".join(parts)
 
 
-from pipeline import (REFUSAL_PAT_RE, _verify_lite, calc_note, premise_correction,
-                      premise_note_text)
+from pipeline import (REFUSAL_PAT_RE, _verify_lite, calc_note, missing_norm_note,
+                      premise_correction, premise_note_text)
 
 
 EV_PENYA = ("5.2. При просрочке оплаты Покупатель уплачивает пени в размере "
@@ -112,3 +112,58 @@ def test_citation_ignores_single_component_refs():
     ev = "ст. 70: испытанию не подлежат. Договор № 14 от 2024 г."
     # «п. 9»/«ст. 70» односоставные — не проверяются (нулевой порог ФП)
     assert _citation_problem("Испытание по ст. 70, правила по п. 9.", ev, "") is None
+
+
+# D4-lite: missing-norm note (частичное покрытие норм → подсказка модели)
+
+EV_NORMS = ("Статья 6. Субъект персональных данных вправе давать согласие.\n"
+            "Статья 9. Согласие на обработку персональных данных.")
+
+
+def test_missing_norm_partial_coverage():
+    note = missing_norm_note(
+        "Какие права у субъекта по ст. 6, 10, 11 152-ФЗ?", EV_NORMS)
+    assert note is not None
+    assert "ст. 6, 9" in note          # покрытые
+    assert "10, 11" in note            # отсутствующие
+    assert "фрагментах" in note        # не «в базе нет»
+    assert "<note>" in note
+
+
+def test_missing_norm_silent_when_full_or_nothing():
+    assert missing_norm_note(
+        "Согласие по ст. 6 и 9 152-ФЗ?", EV_NORMS) is None      # всё покрыто
+    assert missing_norm_note(
+        "Ст. 10 и 11 152-ФЗ?", EV_NORMS) is None                # ни одной нет
+    assert missing_norm_note("Какие сроки приёмки товара?", EV_NORMS) is None
+
+
+def test_missing_norm_partial_lists_related_norm():
+    """При частичном покрытии заметка называет и смежную наличную норму
+    (ст. 9 не запрошена, но стоит рядом) — мотив эталона Q13."""
+    note = missing_norm_note(
+        "Какие права у субъекта по ст. 6, 10, 11 152-ФЗ?", EV_NORMS)
+    assert "ст. 6, 9" in note         # запрошенная 6, затем смежная 9
+    assert "не выдумывай" in note
+
+
+def test_missing_norm_decimal_comma_is_not_list():
+    """«ст. 6,1» = десятичная 6.1, а не список «6, 1»."""
+    ev = "Статья 6.1. Дополнительно к основному согласию."
+    assert missing_norm_note("Согласие по ст. 6,1 152-ФЗ?", ev) is None
+    note = missing_norm_note("Согласие по ст. 6.1, 7 152-ФЗ?", ev)
+    assert note is not None and "ст. 6.1" in note and "ст. 7" in note
+
+
+def test_missing_norm_no_double_spaces():
+    note = missing_norm_note(
+        "Какие права у субъекта по ст. 6, 10, 11 152-ФЗ?", EV_NORMS)
+    assert "  " not in note
+    assert "ст. 10, 11" in note
+
+
+def test_missing_norm_comma_decimal_and_no_false_hit():
+    ev = "Статья 6.1. Дополнительно к основному согласию."
+    note = missing_norm_note("Согласие по ст. 6,1 152-ФЗ?", ev)
+    assert note is None       # «6,1» → «6.1» есть в заголовке, покрытие полное
+    assert missing_norm_note("ст. 6, 9", "нет заголовков статей здесь") is None

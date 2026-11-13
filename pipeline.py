@@ -39,6 +39,11 @@ T1_TRAP_RE = re.compile(r"90\s+календарн", re.I)
 MARKDOWN_RE = re.compile(r"[*_#`]+")
 USER_TURN_SPLIT_RE = re.compile(r"(?=Пользователь:\s)", re.I)
 REFUSAL_PAT_RE = re.compile(r"нет документов|не могу|не удалось|нет сведений", re.I)
+# D4-lite: нормы-реквизиты вопроса «ст. 6», «статьи 10» и заголовки «Статья 9.»
+NORM_ST_RE = re.compile(
+    r"\bст(?:ать[а-яу]*)?\.?\s*(\d+(?:[.,]\d+)*(?:\s*,\s*\d+(?:[.,]\d+)*)*)",
+    re.I)
+NORM_HEADER_RE = re.compile(r"(?m)^\s*Статья\s+(\d+(?:[.,]\d+)*)\.?", re.I)
 
 # B-lite (D3-lite): многокомпонентные пункты «п. 3.1», №-реквизиты, «N-ФЗ».
 # Односоставные («ст. 70», «п. 9») не проверяем — нулевой порог ложных срабатываний
@@ -205,6 +210,44 @@ def calc_note(question: str, evidence_text: str) -> tuple[Optional[str], set[str
     return note, allowed
 
 
+def _norm_key(article: str) -> tuple[int, ...]:
+    """Числовая сортировка статей: «9» < «10», «6.1» → (6, 1)."""
+    return tuple(int(x) for x in re.split(r"[.,]", article))
+
+
+def missing_norm_note(question: str, evidence_text: str) -> Optional[str]:
+    """D4-lite: вопрос перечисляет нормы («ст. 6, 10, 11 152-ФЗ»), фрагменты
+    покрывают ЧАСТЬ → заметка «есть X, нет Y» → частичный ответ вместо голого
+    отказа. Молчим, если из запрошенных покрыты все или не покрыта ни одна:
+    частичное покрытие — единственный случай, где заметка меняет поведение
+    (при полном промахе честный отказ остаётся честным). Наряду с запрошенными
+    перечисляем смежные наличные нормы (кап 4) — модель может найти нужное
+    рядом (мотив эталона Q13: «ст. 9 есть, отвечай по ней»).
+    Разделитель списка — запятая с пробелом: «ст. 6,1» = десятичная 6.1,
+    а не список «6, 1». Формулировка «в фрагментах отсутствуют» (не «в базе
+    нет») — чанк мог просто не доехать до выдачи."""
+    lists = NORM_ST_RE.findall(question)
+    if not lists:
+        return None
+    arts = {a.replace(",", ".").strip()
+            for m in lists for a in re.split(r",\s", m)}
+    arts.discard("")
+    present = {m.group(1).replace(",", ".")
+               for m in NORM_HEADER_RE.finditer(evidence_text)}
+    missing = sorted((a for a in arts if a not in present), key=_norm_key)
+    found_asked = sorted((a for a in arts if a in present), key=_norm_key)
+    if not missing or not found_asked:
+        return None
+    # запрошенные-покрытые первыми, затем смежные наличные; кап 4 — заметка
+    # не должна раздувать промпт на длинном evidence
+    found = found_asked + sorted(
+        (p for p in present if p not in arts), key=_norm_key)[:4]
+    return (f"<note>В фрагментах есть нормы: ст. {', '.join(found)}. Из "
+            f"запрошенных ст. {', '.join(missing)} в предоставленных "
+            f"фрагментах отсутствуют. Ответь по имеющимся, недостающие нормы "
+            f"не выдумывай.</note>")
+
+
 def _finalize(answer: str) -> str:
     """Одна строка, без маркдауна, ≤10 000 символов (§4.1, §15.3 упрощённо)."""
     text = MARKDOWN_RE.sub("", answer)
@@ -351,6 +394,10 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
         if note:
             prompt += "\n\n" + note
             calc_allowed |= allowed
+    if cfg.missing_norm:
+        note = missing_norm_note(question, evidence_src)
+        if note:
+            prompt += "\n\n" + note
     client: Optional[LlmClient] = ctx.get("client")
     if client is None:
         return extractive_fallback(question, ctx, chunks)
