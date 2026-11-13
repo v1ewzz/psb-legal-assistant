@@ -35,7 +35,7 @@ def test_calc_note_gate_blocks_wrong_questions():
 
 
 def test_verify_whitelist_for_calc():
-    ev = "3.1. Плата 450 000 рублей в месяц."
+    ev = "3.1. Плата 500 000 рублей в месяц."
     ans = "Пени составят 4500 рублей."
     assert _verify_lite(ans, ev, {"4500"}) is None   # с whitelist — ок
     assert _verify_lite(ans, ev) is not None         # без — вычисленное число падает
