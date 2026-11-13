@@ -79,7 +79,8 @@ def load_context() -> dict:
             refs = None
             if refs_path is not None:
                 refs = json.loads(refs_path.read_text(encoding="utf-8"))
-            retriever = Retriever(chunks, bm25_path, refs)
+            retriever = Retriever(chunks, bm25_path, refs,
+                                  sibling_fill=cfg.sibling_fill)
     client = LlmClient(cfg) if cfg.api_ready else None
     print(f"Контекст: чанков={len(chunks) if chunks else 0}; "
           f"bm25={'да' if retriever else 'нет'}; "

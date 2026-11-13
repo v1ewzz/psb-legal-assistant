@@ -57,10 +57,12 @@ def load_chunks(cfg: Config) -> list[dict]:
 class Retriever:
     """BM25-поиск по text_ctx + приоритет exact-ref-документов (§9.1/9.2 упрощённо)."""
 
-    def __init__(self, chunks: Sequence[dict], bm25_npz: Path, refs: Optional[dict] = None):
+    def __init__(self, chunks: Sequence[dict], bm25_npz: Path,
+                 refs: Optional[dict] = None, sibling_fill: bool = False):
         self.chunks = list(chunks)
         if not self.chunks:
             raise ValueError("пустой индекс чанков")
+        self.sibling_fill = bool(sibling_fill)  # добор +2 сиблинга (SIBLING_FILL=1)
         self._texts = [c["text_ctx"] for c in self.chunks]
         payload = np.load(bm25_npz, allow_pickle=False)
         self._token_pattern = str(payload["token_pattern"][0])
@@ -102,15 +104,33 @@ class Retriever:
         return hits
 
     def search(self, question: str, top_k: int) -> list[dict]:
-        """→ [{...chunk}] в порядке релевантности, doc-boost вне конкуренции."""
+        """→ [{...chunk}] в порядке релевантности, doc-boost вне конкуренции.
+
+        Sibling-fill (+2, флаг SIBLING_FILL): мульти-фактные вопросы («плата
+        И до какого числа») держат второй факт в соседнем пункте того же
+        документа; срез топ-K его терял. Добор — только чанками документов,
+        УЖЕ представленных в выдаче (новых документов не добавляем)."""
         question = normalize_text(question)
-        query = bm25s.tokenize([question], lower=True, stopwords=[])  # return_ids=True
+        query = bm25s.tokenize([question], lower=True, stopwords=[])
         top_k = max(1, min(top_k or 1, len(self.chunks)))
-        result, _ = self._bm25.retrieve(query, k=top_k)
+        pool = min(top_k + 4, len(self.chunks))
+        result, _ = self._bm25.retrieve(query, k=pool)
         order = [int(i) for i in result[0]]
         ref_docs = self._ref_doc_ids(question)
         if ref_docs:
             in_refs = [i for i in order if self.chunks[i]["doc_id"] in ref_docs]
             rest = [i for i in order if self.chunks[i]["doc_id"] not in ref_docs]
             order = in_refs + rest
-        return [self.chunks[i] for i in order[:top_k]]
+        selected = order[:top_k]
+        if self.sibling_fill:
+            have_docs = {self.chunks[i]["doc_id"] for i in selected}
+            have = set(selected)
+            extra: list[int] = []
+            for i in order[top_k:]:
+                if len(extra) >= 2:
+                    break
+                if self.chunks[i]["doc_id"] in have_docs and i not in have:
+                    extra.append(i)
+                    have.add(i)
+            selected = selected + extra
+        return [self.chunks[i] for i in selected]

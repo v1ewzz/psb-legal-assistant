@@ -37,6 +37,35 @@ SYSTEM_PROMPT = """Ты — юридический ассистент ООО «�
 NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
 T1_TRAP_RE = re.compile(r"90\s+календарн", re.I)
 MARKDOWN_RE = re.compile(r"[*_#`]+")
+USER_TURN_SPLIT_RE = re.compile(r"(?=Пользователь:\s)", re.I)
+
+# B-lite (D3-lite): многокомпонентные пункты «п. 3.1», №-реквизиты, «N-ФЗ».
+# Односоставные («ст. 70», «п. 9») не проверяем — нулевой порог ложных срабатываний
+# важнее полноты (уроки калибровки 27→19).
+CITE_ITEM_RE = re.compile(r"\b(?:п|пп|ст)\.\s*(\d+(?:[.,]\d+)+)")
+CITE_DOC_RE = re.compile(r"№\s*([A-Za-zА-Яа-яЁё0-9][A-Za-zА-Яа-яЁё0-9/\-.]+)")
+CITE_LAW_RE = re.compile(r"\b(\d+(?:[.,]\d+)?\s*[-–—]?\s*ФЗ)\b")
+_CORE_RE = re.compile(r"[^0-9A-Za-zА-Яа-яЁё]")
+
+
+def clamp_question(question: str, limit: int) -> str:
+    """A-фикс: кламп длинной ячейки с сохранением ХВОСТА, а не головы.
+
+    Последняя пользовательская реплика — то, на что отвечаем; режем старую
+    историю. Прежний подход question[:limit] на длинном диалоге отрезал
+    именно её. Ячейки короче лимита не трогаем вовсе (поведение 27.615)."""
+    if limit <= 0 or len(question) <= limit:
+        return question
+    parts = [p for p in USER_TURN_SPLIT_RE.split(question) if p.strip()]
+    if len(parts) >= 2:
+        tail = parts[-1]
+        if len(tail) > limit:
+            tail = tail[-limit:]
+        budget = limit - len(tail)
+        if budget <= 0:
+            return tail
+        return "".join(parts[:-1])[-budget:] + tail
+    return question[-limit:]
 
 
 def _normalize_numbers(text: str) -> str:
@@ -72,6 +101,26 @@ def _verify_lite(answer: str, evidence_text: str) -> Optional[str]:
             continue
         if number not in haystack.replace(",", "."):
             return f"число из ответа не найдено в evidence: «{raw}»"
+    return None
+
+
+def _citation_problem(answer: str, evidence_text: str, question: str) -> Optional[str]:
+    """B-lite: ссылка в ответе обязана найтись во фрагментах ИЛИ в вопросе.
+
+    Проверяем: пункты «п. N.M» (точное сопоставление с точками), №-реквизиты
+    и «N-ФЗ» (по буквенно-цифровому ядру — устойчиво к «А-08/2024» vs
+    «А-08-2024»). None — ок; строка — конкретное нарушение для ретрая."""
+    flat = _normalize_numbers(evidence_text + "\n" + question)
+    core = _CORE_RE.sub("", flat)
+    for num in CITE_ITEM_RE.findall(answer):
+        if num.replace(",", ".") not in flat:
+            return f"ссылка «п. {num}» отсутствует во фрагментах и вопросе"
+    for ref in CITE_DOC_RE.findall(answer):
+        if _CORE_RE.sub("", ref) not in core:
+            return f"реквизит «№ {ref}» отсутствует во фрагментах и вопросе"
+    for law in CITE_LAW_RE.findall(answer):
+        if _CORE_RE.sub("", law) not in core:
+            return f"ссылка «{law.strip()}» отсутствует во фрагментах и вопросе"
     return None
 
 
@@ -168,6 +217,7 @@ def _truncate_sentence(sentence: str, limit: int) -> str:
 def answer_one(question: str, ctx: dict, deadline: float) -> str:
     """Общее ядро batch и web (§5.1 v1). ctx: retriever/client/cfg."""
     cfg = ctx["cfg"]
+    question = clamp_question(question, cfg.max_input_chars)
     retriever = ctx["retriever"]
     if retriever is None:
         return grounded_refusal(question, ctx)
@@ -202,7 +252,14 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
             print(f"LLM недоступна: {last_error}", file=sys.stderr)
             break
         problem = _verify_lite(answer, evidence_src)
+        hard = problem is not None
+        if problem is None and cfg.citation_lint:
+            problem = _citation_problem(answer, evidence_src, question)
         if problem is None:
+            return _finalize(answer)
+        if not hard and attempt == 1:
+            # B-lite не роняет ответ в фолбэк: числа подтверждены, претензия
+            # только к ссылке — после одного ретрая принимаем как есть.
             return _finalize(answer)
         last_error = problem
         print(f"Verify-lite (попытка {attempt + 1}): {problem}", file=sys.stderr)
