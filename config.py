@@ -86,8 +86,8 @@ class Config:
     sibling_fill: bool = True           # добор +2 сиблинга того же документа (eval: 0.65→0.71-0.73)
     calc_note: bool = False             # C: расчёт пени в <note> + whitelist verify (CALC_NOTE=1)
     premise_note: bool = False          # D: расхождение предпосылки в <note> (PREMISE_NOTE=1)
-    refusal_retry: bool = False         # E: ретрай при переотказе с exact-ref (REFUSAL_RETRY=1)
-    missing_norm: bool = False          # D4: заметка о частичном покрытии норм (MISSING_NORM=1)
+    refusal_retry: bool = True          # E: ретрай при переотказе с exact-ref (рычаг №1; REFUSAL_RETRY=0 выкл)
+    missing_norm: bool = True           # D4: заметка о частичном покрытии норм (рычаг №1; MISSING_NORM=0 выкл)
 
     @property
     def api_ready(self) -> bool:
@@ -134,8 +134,8 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         sibling_fill=_bool_flag(env.get("SIBLING_FILL"), True),
         calc_note=_bool_flag(env.get("CALC_NOTE"), False),
         premise_note=_bool_flag(env.get("PREMISE_NOTE"), False),
-        refusal_retry=_bool_flag(env.get("REFUSAL_RETRY"), False),
-        missing_norm=_bool_flag(env.get("MISSING_NORM"), False),
+        refusal_retry=_bool_flag(env.get("REFUSAL_RETRY"), True),
+        missing_norm=_bool_flag(env.get("MISSING_NORM"), True),
     )
 
 
