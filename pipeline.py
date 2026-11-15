@@ -380,7 +380,9 @@ def _premise_mismatch(question: str, chunks: list[dict]):
 
     for m in re.finditer(r"\d[\d\u00a0 ]*(?:\d)|\d+(?:[.,]\d+)?", flat_question):
         raw = re.sub(r"[\u00a0 ]", "", m.group().replace(",", "."))
-        if len(raw) < 6 or raw in ev_norm:
+        # число отсутствует в evidence, только если нет ТОЧНОГО совпадения —
+        # подстрока длинного числа («1 500 000» содержит «500000») не считается
+        if len(raw) < 6 or re.search(rf"(?<!\d){re.escape(raw)}(?!\d)", ev_norm):
             continue
         # только числа в денежном/процентном контексте — той же разрядности
         # «450 000 рублей», а также «450 000 (пропись) рублей» — допустима скобка

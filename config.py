@@ -84,8 +84,10 @@ class Config:
     citation_lint: bool = True          # B-lite: сверка ссылок с фрагментами (на демо инертен,
                                         # фантомные ссылки ловит; в фолбэк не роняет — 1 ретрай)
     sibling_fill: bool = True           # добор +2 сиблинга того же документа (eval: 0.65→0.71-0.73)
-    calc_note: bool = False             # C: расчёт пени в <note> + whitelist verify (CALC_NOTE=1)
-    premise_note: bool = False          # D: расхождение предпосылки в <note> (PREMISE_NOTE=1)
+    calc_note: bool = True              # C: расчёт пени в <note> + whitelist verify (CALC_NOTE=0 выкл)
+    premise_note: bool = True           # D: расхождение предпосылки в <note> (PREMISE_NOTE=0 выкл);
+                                        # детекция — по границам цифр (подстрока «1 500 000»
+                                        # не глушит «500 000», ловушка Никиты №1)
     refusal_retry: bool = True          # E: ретрай при переотказе с exact-ref (рычаг №1; REFUSAL_RETRY=0 выкл)
     missing_norm: bool = True           # D4: заметка о частичном покрытии норм (рычаг №1; MISSING_NORM=0 выкл)
     verify_v2: bool = True              # рычаг №2: пара число+единица обязана лежать в одном
@@ -136,8 +138,8 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         max_input_chars=clamp_int(env.get("MAX_INPUT_CHARS"), 500, 16000, 4000),
         citation_lint=_bool_flag(env.get("CITATION_LINT"), True),
         sibling_fill=_bool_flag(env.get("SIBLING_FILL"), True),
-        calc_note=_bool_flag(env.get("CALC_NOTE"), False),
-        premise_note=_bool_flag(env.get("PREMISE_NOTE"), False),
+        calc_note=_bool_flag(env.get("CALC_NOTE"), True),
+        premise_note=_bool_flag(env.get("PREMISE_NOTE"), True),
         refusal_retry=_bool_flag(env.get("REFUSAL_RETRY"), True),
         missing_norm=_bool_flag(env.get("MISSING_NORM"), True),
         verify_v2=_bool_flag(env.get("VERIFY_V2"), True),

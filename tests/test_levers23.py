@@ -3,7 +3,7 @@
 evidence) и №3 (детерминированный render: трим по предложению, «Источник:»)."""
 from config import from_env
 from pipeline import (_finalize, _render_refs, _unit_pair_problem, _unit_pairs,
-                      _verify_lite)
+                      _verify_lite, premise_note_text)
 
 # Реальные формулировки demo-базы (п. 3.1 аренды, п. 4.2 поставки, п. 3.2 регламента)
 EV_RENT = ("3.1. Арендная плата составляет 450 000 (четыреста пятьдесят тысяч) "
@@ -127,3 +127,27 @@ def test_flags_default_on_and_env_off():
     assert from_env({}).render_det is True
     assert from_env({"VERIFY_V2": "0"}).verify_v2 is False
     assert from_env({"RENDER_DET": "0"}).render_det is False
+
+
+# ---------- фикс детектора предпосылок (границы цифр) ----------
+
+def test_premise_note_fires_on_rent_trap():
+    """Ловушка Никиты «500 000 без НДС»: подстрока длинного числа в выдаче
+    («1 500 000») не должна глушить детекцию."""
+    chunks = [
+        {"short_name": "Договор аренды № А-08/2024 с ООО «Северный Склад»",
+         "text": "3.1. Арендная плата составляет 450 000 рублей в месяц, включая НДС."},
+        {"short_name": "Прочее",
+         "text": "Стоимость хранения крупной партии — 1 500 000 рублей в год."},
+    ]
+    q = ("По договору аренды А-08/2024 с ООО «Северный Склад» арендная плата "
+         "составляет 500 000 рублей в месяц без НДС?")
+    note = premise_note_text(q, chunks)
+    assert note is not None and "500 000" in note and "450 000" in note
+
+
+def test_premise_note_silent_when_number_exists():
+    chunks = [{"short_name": "Договор аренды № А-08/2024",
+               "text": "3.1. Арендная плата составляет 450 000 рублей в месяц."}]
+    q = "Правда ли, что арендная плата составляет 450 000 рублей в месяц?"
+    assert premise_note_text(q, chunks) is None
