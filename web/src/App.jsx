@@ -35,6 +35,7 @@ export default function App() {
   const [today, setToday] = useState("2026-10-10");
   const [modalSource, setModalSource] = useState(null);
   const [docsOpen, setDocsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const seq = useRef(0);
   const aborter = useRef(null);
@@ -208,21 +209,83 @@ export default function App() {
       <header className="header">
         <div className="header__brand">
           <span className="header__mark" aria-hidden="true">ПСБ</span>
-          Юридический ассистент
+          <span className="header__name">Юридический ассистент</span>
         </div>
         <span className="header__sub">
           ООО «Меридиан» · {docs.length || 21} документов · база выгружена {today.split("-").reverse().join(".")}
         </span>
         <div className="header__spacer" />
-        <span className="chip-mode" data-mode={API_MODE}>
-          {API_MODE === "mock" ? "мок-режим · без LLM" : "SSE · живое ядро"}
-        </span>
-        <button type="button" className="btn" onClick={() => setDocsOpen(true)}>
-          Документы базы
-        </button>
-        <button type="button" className="btn" onClick={reset} disabled={messages.length === 0}>
-          Новый диалог
-        </button>
+        <div className="header__actions">
+          <span className="chip-mode" data-mode={API_MODE}>
+            {API_MODE === "mock" ? "мок-режим · без LLM" : "SSE · живое ядро"}
+          </span>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              setMenuOpen(false);
+              setDocsOpen(true);
+            }}
+          >
+            Документы базы
+          </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              setMenuOpen(false);
+              reset();
+            }}
+            disabled={messages.length === 0}
+          >
+            Новый диалог
+          </button>
+          <button
+            type="button"
+            className="header__burger"
+            aria-label="Меню"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
+        </div>
+
+        {menuOpen && (
+          <>
+            <div className="header__backdrop" onClick={() => setMenuOpen(false)} />
+            <nav className="header__menu" aria-label="Меню интерфейса">
+              <span className="chip-mode" data-mode={API_MODE}>
+                {API_MODE === "mock" ? "мок-режим · без LLM" : "SSE · живое ядро"}
+              </span>
+              <button
+                type="button"
+                className="btn"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setDocsOpen(true);
+                }}
+              >
+                Документы базы
+              </button>
+              <button
+                type="button"
+                className="btn"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  reset();
+                }}
+                disabled={messages.length === 0}
+              >
+                Новый диалог
+              </button>
+            </nav>
+          </>
+        )}
       </header>
 
       <main className="chat">
