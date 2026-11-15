@@ -29,6 +29,7 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [tab, setTab] = useState("sources"); // "sources" | "trace" | "docs"
+  const [mobileView, setMobileView] = useState("chat"); // "chat" | "panel"
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [sessionCount, setSessionCount] = useState(0);
@@ -36,6 +37,7 @@ export default function App() {
   const [today, setToday] = useState("2026-10-10");
   const [modalSource, setModalSource] = useState(null);
   const [docsOpen, setDocsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const seq = useRef(0);
   const aborter = useRef(null);
@@ -105,6 +107,7 @@ export default function App() {
       ]);
       setSelectedId(assistantId);
       setBusy(true);
+      setMobileView("chat");
       setNotice(truncated ? "Вопрос обрезан по лимиту 4000 символов (MAX_INPUT_CHARS)" : "");
 
       try {
@@ -173,6 +176,7 @@ export default function App() {
     setSessionCount(0);
     setNotice("");
     setTab("sources");
+    setMenuOpen(false);
   };
 
   const openSource = (source) => setModalSource(source);
@@ -180,6 +184,7 @@ export default function App() {
   const openPanel = (nextTab, messageId) => {
     if (messageId) setSelectedId(messageId);
     setTab(nextTab);
+    setMobileView("panel");
   };
 
   const openDocById = async (docId) => {
@@ -204,29 +209,33 @@ export default function App() {
     if (msg.question) ask(msg.question);
   };
 
+  const currentMode = getApiMode();
+
   return (
     <div className="page-container">
-      {/* Топбар по макету 01_main_screen.html */}
+      {/* Топбар с адаптивным меню и бургером */}
       <header className="topbar">
         <span className="logo">
-          <span className="logo-mark">П</span>
-          ПСБ · Юридический ассистент
+          <span className="logo-mark" aria-hidden="true">П</span>
+          <span className="logo-text">ПСБ · Юридический ассистент</span>
         </span>
-        <span className="tag">
+
+        <span className="topbar__sub">
           ООО «Меридиан» · {docs.length || 21} документов · база выгружена {today.split("-").reverse().join(".")}
         </span>
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+
+        {/* Действия на десктопе */}
+        <div className="topbar__actions">
           <button
             type="button"
-            className="tag"
-            onClick={() => setApiMode(getApiMode() === "mock" ? "sse" : "mock")}
+            className="tag tag--clickable"
+            onClick={() => setApiMode(currentMode === "mock" ? "sse" : "mock")}
             title="Нажмите для переключения режима"
             style={{
-              cursor: "pointer",
-              color: getApiMode() === "mock" ? "var(--status-partial-color)" : "var(--status-full-color)",
+              color: currentMode === "mock" ? "var(--status-partial-color)" : "var(--status-full-color)",
             }}
           >
-            {getApiMode() === "mock" ? "● мок-режим (клик: SSE ядро)" : "● SSE · живое ядро (клик: мок)"}
+            {currentMode === "mock" ? "● мок-режим (клик: SSE)" : "● SSE · живое ядро (клик: мок)"}
           </button>
           <button type="button" className="btn" onClick={() => setDocsOpen(true)}>
             Документы базы
@@ -240,23 +249,106 @@ export default function App() {
             Новый диалог
           </button>
         </div>
+
+        {/* Бургер-кнопка для мобильных и планшетов */}
+        <button
+          type="button"
+          className="topbar__burger"
+          aria-label="Меню"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        {/* Выпадающее бургер-меню */}
+        {menuOpen && (
+          <>
+            <div className="topbar__backdrop" onClick={() => setMenuOpen(false)} />
+            <nav className="topbar__menu" aria-label="Мобильное меню">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-subtle)", paddingBottom: 8 }}>
+                <span style={{ fontWeight: "bold", fontSize: "var(--fs-body-small)", color: "var(--text-primary)" }}>
+                  Меню ассистента
+                </span>
+                <button type="button" className="close-btn" onClick={() => setMenuOpen(false)}>✕</button>
+              </div>
+
+              <button
+                type="button"
+                className="btn"
+                style={{
+                  justifyContent: "center",
+                  color: currentMode === "mock" ? "var(--status-partial-color)" : "var(--status-full-color)",
+                }}
+                onClick={() => setApiMode(currentMode === "mock" ? "sse" : "mock")}
+              >
+                {currentMode === "mock" ? "● Мок-режим (включить SSE)" : "● SSE Ядро (включить Мок)"}
+              </button>
+
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setDocsOpen(true);
+                }}
+              >
+                📚 Каталог документов ({docs.length || 21})
+              </button>
+
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  setMenuOpen(false);
+                  reset();
+                }}
+                disabled={messages.length === 0}
+              >
+                🔄 Начать новый диалог
+              </button>
+
+              <div style={{ fontSize: "var(--fs-caption)", color: "var(--text-muted)", textAlign: "center", marginTop: 4 }}>
+                База выгружена: {today.split("-").reverse().join(".")}
+              </div>
+            </nav>
+          </>
+        )}
       </header>
 
-      {/* Основная рабочая область: сетка чат + боковая панель */}
-      <div className="layout">
+      {/* Мобильный переключатель вкладок: Чат vs Панель разбора */}
+      <div className="mobile-view-tabs">
+        <button
+          type="button"
+          className={`mobile-view-tab ${mobileView === "chat" ? "mobile-view-tab--active" : ""}`}
+          onClick={() => setMobileView("chat")}
+        >
+          💬 Чат {messages.length > 0 ? `(${messages.length})` : ""}
+        </button>
+        <button
+          type="button"
+          className={`mobile-view-tab ${mobileView === "panel" ? "mobile-view-tab--active" : ""}`}
+          onClick={() => setMobileView("panel")}
+        >
+          📊 {tab === "sources" ? "Источники" : tab === "trace" ? "Разбор Trace" : "Документы"}
+        </button>
+      </div>
+
+      {/* Основная сетка приложения */}
+      <div className={`layout layout--${mobileView}`}>
         {/* ============ ЗОНА 1: ЧАТ ============ */}
-        <section className="chat">
+        <section className={`chat ${mobileView === "panel" ? "chat--hidden-mobile" : ""}`}>
           <div className="chat__scroll" ref={scrollRef}>
             {messages.length === 0 && (
-              <div className="chat__empty" style={{ padding: "var(--sp-6) var(--sp-4)", textAlign: "center" }}>
-                <h2 style={{ fontSize: "var(--fs-h2)", color: "var(--text-primary)", marginBottom: 8 }}>
-                  Юридический ассистент с подтверждением источников
-                </h2>
-                <p style={{ color: "var(--text-secondary)", maxWidth: 600, margin: "0 auto", lineHeight: "var(--lh-normal)" }}>
+              <div className="chat__empty">
+                <h2>Юридический ассистент с подтверждением источников</h2>
+                <p>
                   21 документ в базе (законы и документы компании). Все ответы подтверждаются ссылками на пункты,
                   проходят детектор инъекций (D2), проверку цитат и разбор решений (D1–D4).
                 </p>
-                <div style={{ marginTop: 24, fontSize: "var(--fs-caption)", color: "var(--text-muted)" }}>
+                <div className="chat__empty-hint">
                   Выберите подсказку ниже или введите свой вопрос:
                 </div>
               </div>
@@ -287,7 +379,7 @@ export default function App() {
         </section>
 
         {/* ============ ЗОНА 2 & 3: ПРАВАЯ ПАНЕЛЬ ============ */}
-        <aside className="side">
+        <aside className={`side ${mobileView === "chat" ? "side--hidden-mobile" : ""}`}>
           <div className="tabs">
             <div
               className={`tab ${tab === "sources" ? "tab--active" : ""}`}
@@ -315,10 +407,10 @@ export default function App() {
             </div>
           </div>
 
-          <div className="panel" style={{ minHeight: 380 }}>
+          <div className="panel">
             {tab === "sources" && (
               <>
-                <h3 style={{ fontSize: "var(--fs-body-small)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                <h3 className="panel-title">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--psb-orange-500)" strokeWidth="2" strokeLinecap="round">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z" />
                   </svg>
@@ -334,7 +426,7 @@ export default function App() {
 
             {tab === "docs" && (
               <>
-                <h3 style={{ fontSize: "var(--fs-body-small)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                <h3 className="panel-title">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--psb-orange-500)" strokeWidth="2" strokeLinecap="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <path d="M14 2v6h6" />
@@ -349,7 +441,7 @@ export default function App() {
       </div>
 
       {/* ============ ЗОНА 4: ТАЙМЛАЙН РЕДАКЦИЙ (СНИЗУ) ============ */}
-      <div style={{ maxWidth: 1180, margin: "0 auto var(--sp-5)", padding: "0 var(--sp-4)" }}>
+      <div className="timeline-container">
         <Timeline
           timeline={timeline}
           eventDate={activeAnswer?.trace?.edition?.event_date ?? null}

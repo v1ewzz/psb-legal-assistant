@@ -2,8 +2,7 @@ import { useRef, useState } from "react";
 import { LIMITS } from "../api/contract.js";
 
 /**
- * Блок ввода вопроса по макету 01_main_screen.html:
- * .input-bar, textarea, .send-btn (оранжевый градиент), .input-hint, демо-подсказки.
+ * Блок ввода вопроса с защитой от переполнения и адаптивным переносом.
  */
 export default function Composer({
   onSend,
@@ -40,21 +39,21 @@ export default function Composer({
   }
 
   return (
-    <div className="composer-area" style={{ display: "grid", gap: 8 }}>
+    <div className="composer-container">
       {notice && (
-        <div className="notice" role="status" style={{ fontSize: "var(--fs-caption)", color: "var(--status-partial-color)", background: "var(--status-partial-bg)", border: "1px solid var(--status-partial-border)", padding: "6px 12px", borderRadius: "var(--radius-sm)" }}>
+        <div className="composer__notice" role="status">
           {notice}
         </div>
       )}
 
-      {/* Быстрые подсказки-демо (макет 01/02) */}
+      {/* Быстрые подсказки-демо с плавным скроллом */}
       {hints.length > 0 && !busy && (
-        <div className="composer__hints" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <div className="composer__hints">
           {hints.map((hint) => (
             <button
               key={hint.id}
               type="button"
-              className="chip"
+              className="chip chip--hint"
               onClick={() => useHint(hint.question)}
               disabled={limitReached}
               title={hint.question}
@@ -65,7 +64,7 @@ export default function Composer({
         </div>
       )}
 
-      {/* Поле ввода вопроса: .input-bar */}
+      {/* Поле ввода: .input-bar */}
       <div className="input-bar">
         <label className="sr-only" htmlFor="question">
           Задайте вопрос по нормативным документам
@@ -73,6 +72,7 @@ export default function Composer({
         <textarea
           id="question"
           ref={inputRef}
+          className="input-bar__textarea"
           placeholder="Задайте вопрос по нормативным документам (например: какая арендная плата по договору А-08?)"
           value={value}
           rows={2}
@@ -81,7 +81,7 @@ export default function Composer({
           disabled={limitReached}
         />
         {busy ? (
-          <button type="button" className="send-btn" style={{ background: "var(--status-refusal-color)" }} onClick={onStop}>
+          <button type="button" className="send-btn send-btn--stop" onClick={onStop}>
             Стоп
           </button>
         ) : (
@@ -96,13 +96,13 @@ export default function Composer({
         )}
       </div>
 
-      {/* Подсказка под полем ввода: .input-hint */}
-      <div className="input-hint" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span>
+      {/* Подсказка под полем ввода */}
+      <div className="input-hint">
+        <span className="input-hint__text">
           Лимит {LIMITS.question_chars} симв. · сессия {sessionCount}/{LIMITS.session_questions} вопр. · ответы строго по базе знаний
         </span>
         {value.length > 0 && (
-          <span style={{ color: over ? "var(--status-refusal-color)" : "var(--text-muted)", fontFamily: "var(--font-mono)", fontSize: "var(--fs-caption)" }}>
+          <span className={`input-hint__counter ${over ? "input-hint__counter--over" : ""}`}>
             {value.length}/{LIMITS.question_chars}
           </span>
         )}
