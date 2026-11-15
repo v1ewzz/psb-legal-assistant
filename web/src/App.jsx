@@ -7,7 +7,7 @@ import DocsPanel from "./components/DocsPanel.jsx";
 import Timeline from "./components/Timeline.jsx";
 import DocumentModal from "./components/DocumentModal.jsx";
 import DocsDrawer from "./components/DocsDrawer.jsx";
-import { API_MODE, askQuestion, clampQuestion } from "./api/client.js";
+import { API_MODE, askQuestion, clampQuestion, getApiMode, setApiMode } from "./api/client.js";
 import { loadDoc, loadDocsIndex, loadToday } from "./api/docs.js";
 import { LIMITS, normalizeAnswer } from "./api/contract.js";
 import { buildTimeline } from "./lib/timeline.js";
@@ -216,9 +216,18 @@ export default function App() {
           ООО «Меридиан» · {docs.length || 21} документов · база выгружена {today.split("-").reverse().join(".")}
         </span>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-          <span className="tag" style={{ color: API_MODE === "mock" ? "var(--status-partial-color)" : "var(--status-full-color)" }}>
-            {API_MODE === "mock" ? "● мок-режим (без LLM)" : "● SSE · живое ядро"}
-          </span>
+          <button
+            type="button"
+            className="tag"
+            onClick={() => setApiMode(getApiMode() === "mock" ? "sse" : "mock")}
+            title="Нажмите для переключения режима"
+            style={{
+              cursor: "pointer",
+              color: getApiMode() === "mock" ? "var(--status-partial-color)" : "var(--status-full-color)",
+            }}
+          >
+            {getApiMode() === "mock" ? "● мок-режим (клик: SSE ядро)" : "● SSE · живое ядро (клик: мок)"}
+          </button>
           <button type="button" className="btn" onClick={() => setDocsOpen(true)}>
             Документы базы
           </button>
@@ -271,7 +280,7 @@ export default function App() {
             onSend={ask}
             onStop={stop}
             busy={busy}
-            hints={API_MODE === "mock" ? DEMO_HINTS : []}
+            hints={DEMO_HINTS}
             sessionCount={sessionCount}
             notice={notice}
           />

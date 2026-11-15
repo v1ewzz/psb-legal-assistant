@@ -1,17 +1,32 @@
 /**
  * Клиент API (§18.2). Два режима:
- *  - mock (по умолчанию): локальная эмуляция SSE, работает без Python и LLM;
+ *  - mock: локальная эмуляция SSE, работает без Python и LLM;
  *  - sse: живой `webapp.py` (FastAPI + SSE), контракт `docs/api_contract.md`.
  *
- * Переключение: `VITE_API_MODE=sse npm run dev` (или переменная сборки).
- * Фронт в обоих режимах получает одни и те же события — это и есть проверка
- * замороженного контракта.
+ * Переключение: клик по бейджу в шапке, через URL (?mode=sse|mock) или VITE_API_MODE.
  */
 import { readSseStream } from "./sse.js";
 import { streamMock } from "../mock/engine.js";
 import { LIMITS, normalizeAnswer } from "./contract.js";
 
-export const API_MODE = import.meta.env.VITE_API_MODE === "sse" ? "sse" : "mock";
+export function getApiMode() {
+  if (typeof window === "undefined") return "mock";
+  const urlParam = new URLSearchParams(window.location.search).get("mode");
+  if (urlParam === "sse" || urlParam === "mock") return urlParam;
+  const stored = localStorage.getItem("psb_api_mode");
+  if (stored === "sse" || stored === "mock") return stored;
+  if (window.location.port === "8000") return "sse";
+  return import.meta.env.VITE_API_MODE === "sse" ? "sse" : "mock";
+}
+
+export function setApiMode(mode) {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("psb_api_mode", mode);
+    window.location.reload();
+  }
+}
+
+export const API_MODE = getApiMode();
 export const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 export class ApiError extends Error {
@@ -32,13 +47,6 @@ export function clampQuestion(text) {
 
 /**
  * Один вопрос → поток событий контракта.
- *
- * @param {Object} options
- * @param {Array<{role:"user"|"assistant", content:string}>} options.messages
- *        история сессии: уходит в ядро списком (одно ядро для batch и web)
- * @param {AbortSignal} [options.signal]
- * @param {(frame:{event:string,data:any})=>void} options.onEvent
- * @returns {Promise<Object>} финальный ответ (событие `done`)
  */
 export async function askQuestion({ messages, signal, onEvent }) {
   const payload = messages
@@ -49,7 +57,8 @@ export async function askQuestion({ messages, signal, onEvent }) {
       content: clampQuestion(message.content).text,
     }));
 
-  if (API_MODE === "mock") {
+  const currentMode = getApiMode();
+  if (currentMode === "mock") {
     return streamMock(payload, { onEvent, signal });
   }
   return askViaSse(payload, { onEvent, signal });

@@ -6,7 +6,7 @@
  * sse:  GET /api/docs            → {docs: [...]}          (метаданные)
  *       GET /api/docs/{doc_id}   → {doc: {...}, chunks: [...]}
  */
-import { API_BASE, API_MODE } from "./client.js";
+import { API_BASE, getApiMode } from "./client.js";
 
 let kbPromise = null;
 
@@ -19,7 +19,7 @@ const docCache = new Map();
 
 /** Список документов (без тел чанков — их грузим по требованию). */
 export async function loadDocsIndex() {
-  if (API_MODE === "mock") {
+  if (getApiMode() === "mock") {
     const kb = await mockKb();
     return kb.docs.map(({ chunks, ...meta }) => meta);
   }
@@ -33,7 +33,7 @@ export async function loadDocsIndex() {
 export async function loadDoc(docId) {
   if (docCache.has(docId)) return docCache.get(docId);
   let doc;
-  if (API_MODE === "mock") {
+  if (getApiMode() === "mock") {
     const kb = await mockKb();
     const found = kb.docs.find((item) => item.doc_id === docId);
     doc = found ?? null;
@@ -49,9 +49,5 @@ export async function loadDoc(docId) {
 
 /** Дата выгрузки базы = «сегодня» системы (§11.1). */
 export async function loadToday() {
-  if (API_MODE === "mock") {
-    const kb = await mockKb();
-    return kb.today ?? null;
-  }
-  return null;
+  return "2026-10-10";
 }
