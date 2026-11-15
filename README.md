@@ -84,6 +84,9 @@ set DATA_DIR=data
 # веб-чат (Фаза 5)
 uvicorn webapp:app
 
+# фронт (§18): мок-режим без LLM, подробности в web/README.md
+cd web && npm install && npm run dev
+
 # сборка сабмит-ZIP (плоские модули + артефакты в корне, §2.3)
 .venv\Scripts\python scripts/make_submit.py
 ```
