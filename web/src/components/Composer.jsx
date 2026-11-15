@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { LIMITS } from "../api/contract.js";
 
 /**
- * Поле ввода (§18.2): лимит длины вопроса, счётчик запросов на сессию,
- * подсказки-демо и кнопка остановки стриминга.
+ * Блок ввода вопроса по макету 01_main_screen.html:
+ * .input-bar, textarea, .send-btn (оранжевый градиент), .input-hint, демо-подсказки.
  */
 export default function Composer({
   onSend,
@@ -40,16 +40,21 @@ export default function Composer({
   }
 
   return (
-    <div className="composer">
-      {notice && <p className="notice" role="status">{notice}</p>}
+    <div className="composer-area" style={{ display: "grid", gap: 8 }}>
+      {notice && (
+        <div className="notice" role="status" style={{ fontSize: "var(--fs-caption)", color: "var(--status-partial-color)", background: "var(--status-partial-bg)", border: "1px solid var(--status-partial-border)", padding: "6px 12px", borderRadius: "var(--radius-sm)" }}>
+          {notice}
+        </div>
+      )}
 
+      {/* Быстрые подсказки-демо (макет 01/02) */}
       {hints.length > 0 && !busy && (
-        <div className="composer__hints">
+        <div className="composer__hints" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {hints.map((hint) => (
             <button
               key={hint.id}
               type="button"
-              className="hint"
+              className="chip"
               onClick={() => useHint(hint.question)}
               disabled={limitReached}
               title={hint.question}
@@ -60,49 +65,47 @@ export default function Composer({
         </div>
       )}
 
-      <div className="composer__row">
+      {/* Поле ввода вопроса: .input-bar */}
+      <div className="input-bar">
         <label className="sr-only" htmlFor="question">
-          Вопрос по документам базы
+          Задайте вопрос по нормативным документам
         </label>
         <textarea
           id="question"
           ref={inputRef}
-          className="composer__input"
-          placeholder="Спросите про договор, регламент или норму — ответ будет со ссылками на пункты"
+          placeholder="Задайте вопрос по нормативным документам (например: какая арендная плата по договору А-08?)"
           value={value}
           rows={2}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          aria-describedby="composer-counter"
           disabled={limitReached}
         />
         {busy ? (
-          <button type="button" className="btn" onClick={onStop}>
+          <button type="button" className="send-btn" style={{ background: "var(--status-refusal-color)" }} onClick={onStop}>
             Стоп
           </button>
         ) : (
           <button
             type="button"
-            className="btn btn--primary"
+            className="send-btn"
             onClick={submit}
             disabled={!value.trim() || limitReached}
-            title={over ? "Вопрос будет обрезан до 4000 символов (лимит ядра)" : undefined}
           >
             Спросить
           </button>
         )}
       </div>
 
-      <div className="composer__foot" id="composer-counter">
-        <span className="composer__count" data-over={over}>
-          {value.length} / {LIMITS.question_chars}
-        </span>
+      {/* Подсказка под полем ввода: .input-hint */}
+      <div className="input-hint" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span>
-          вопрос {Math.min(sessionCount + 1, LIMITS.session_questions)} из{" "}
-          {LIMITS.session_questions} в сессии
+          Лимит {LIMITS.question_chars} симв. · сессия {sessionCount}/{LIMITS.session_questions} вопр. · ответы строго по базе знаний
         </span>
-        <span>Enter — отправить, Shift+Enter — перенос строки</span>
-        {over && <span>вопрос будет обрезан по лимиту ядра</span>}
+        {value.length > 0 && (
+          <span style={{ color: over ? "var(--status-refusal-color)" : "var(--text-muted)", fontFamily: "var(--font-mono)", fontSize: "var(--fs-caption)" }}>
+            {value.length}/{LIMITS.question_chars}
+          </span>
+        )}
       </div>
     </div>
   );

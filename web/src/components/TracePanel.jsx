@@ -2,178 +2,263 @@ import StatusBadge from "./StatusBadge.jsx";
 import { STATUS } from "../api/contract.js";
 import { formatDate, formatPercent } from "../lib/text.js";
 
-const SUB_LABELS = {
-  supported: { icon: "✓", text: "поддержан", tone: "ok" },
-  partial: { icon: "◐", text: "частично", tone: "warn" },
-  unsupported: { icon: "✕", text: "не поддержан", tone: "stop" },
-  not_established: { icon: "?", text: "не установлен", tone: "muted" },
-};
-
 /**
- * Блок «Как принято решение» (§18.1 п.3) — главный экран для экспертов.
- * Порядок разделов = порядок логики ядра: тип запроса → найденные положения →
- * подвопросы → confidence и причины → редакция → проверка цитат.
+ * Блок «Как принято решение» (§18.1 п.3, макет 03_trace_panel.html).
+ * Главный продающий экран для экспертов и жюри:
+ * Шаги 1-5 читаются сверху вниз как логика рождения ответа.
  */
 export default function TracePanel({ answer }) {
   if (!answer?.trace) {
-    return <p className="panel__hint">Trace появится вместе с ответом: тип запроса, найденные положения, confidence с причинами, редакция и проверка цитат.</p>;
+    return (
+      <div className="panel__hint" style={{ padding: "var(--sp-4)", color: "var(--text-muted)", fontSize: "var(--fs-body-small)" }}>
+        Trace появится вместе с ответом: тип запроса, найденные положения, применённая редакция,
+        confidence с причинами, гейты безопасности и проверка цитат.
+      </div>
+    );
   }
 
   const trace = answer.trace;
-  const confidence = trace.confidence;
-  const zone = STATUS[confidence.zone] ?? STATUS.partial;
+  const confidence = trace.confidence || { value: answer.confidence || 0, reasons: [] };
+  const confVal = Number(confidence.value ?? answer.confidence ?? 0);
+  const confPct = Math.round(confVal * 100);
+  const rawStatus = answer.status || "partial";
+  const normStatus = rawStatus === "question_error" ? "error" : rawStatus;
+
+  const totalMs = trace.timings?.total_ms ? (trace.timings.total_ms / 1000).toFixed(1) : null;
+  const edition = trace.edition;
+  const citations = trace.citations;
+  const gates = trace.gates || [];
+  const dropped = trace.dropped || [];
+
+  const gaugeColor =
+    normStatus === "full" ? "var(--status-full-color)"
+    : normStatus === "partial" ? "var(--status-partial-color)"
+    : normStatus === "refusal" ? "var(--status-refusal-color)"
+    : "var(--status-error-color)";
 
   return (
-    <>
-      <section className="trace__section">
-        <h3 className="trace__label">Тип запроса</h3>
-        <p className="trace__value">{trace.request_type_label}</p>
-        <p className="trace__note">
-          <code>request_type: {trace.request_type}</code>
-        </p>
-        {trace.standalone_query && (
-          <p className="trace__note">Запрос к поиску: «{trace.standalone_query}»</p>
-        )}
-      </section>
-
-      <section className="trace__section">
-        <h3 className="trace__label">Найденные положения ({trace.retrieved.length})</h3>
-        {trace.retrieved.length === 0 ? (
-          <p className="trace__note">Поиск не дал положений выше порога.</p>
-        ) : (
-          <ul className="retrieved">
-            {trace.retrieved.map((item, index) => (
-              <li className="retrieved__row" key={`${item.doc_id}-${item.path}-${index}`}>
-                <span className="retrieved__name" title={`${item.short_name} — ${item.path}`}>
-                  {item.path || "фрагмент"} · {item.short_name}
-                  <span className="retrieved__score"> [{item.channel}]</span>
-                </span>
-                <span className="retrieved__score">{formatPercent(item.score)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="trace__section">
-        <h3 className="trace__label">Статусы подвопросов ({trace.subquestions.length})</h3>
-        {trace.subquestions.length === 0 ? (
-          <p className="trace__note">Вопрос не разложен на подвопросы.</p>
-        ) : (
-          <ul className="trace__list">
-            {trace.subquestions.map((sub) => {
-              const label = SUB_LABELS[sub.status] ?? SUB_LABELS.unsupported;
-              const tone = label.tone === "ok" ? "ok" : label.tone === "stop" ? "fail" : "wait";
-              return (
-                <li className={`trace__item trace__item--${tone}`} key={sub.id}>
-                  <span>
-                    <strong>{label.text}:</strong> {sub.text}
-                    {sub.reason && <span className="trace__note"> — {sub.reason}</span>}
-                    {sub.source_ids.length > 0 && (
-                      <span className="trace__note"> (источники: {sub.source_ids.join(", ")})</span>
-                    )}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      <section className="trace__section">
-        <h3 className="trace__label">Confidence и причины</h3>
-        <div className="confidence">
-          <span className="confidence__value">{formatPercent(confidence.value)}</span>
-          <span className="confidence__zone">
-            <StatusBadge status={confidence.zone} compact />
-            <br />
-            порог полного {formatPercent(confidence.threshold_high)}, отказ ниже{" "}
-            {formatPercent(confidence.threshold_low)}
+    <div className="trace-panel-wrap" style={{ display: "grid", gap: "var(--sp-4)" }}>
+      <div className="trace" style={{ background: "var(--surface-panel)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+        {/* Заголовок панели */}
+        <div
+          className="trace-header"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "12px 16px",
+            background: "linear-gradient(90deg, rgba(255,92,43,0.12), transparent 65%)",
+            borderBottom: "1px solid var(--border-subtle)",
+          }}
+        >
+          <h2 style={{ fontSize: "var(--fs-h3)", fontWeight: "var(--fw-bold)", margin: 0 }}>
+            Как принято решение
+          </h2>
+          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+            <StatusBadge status={rawStatus} compact />
+            {totalMs && (
+              <span style={{ fontSize: "var(--fs-caption)", color: "var(--text-muted)" }}>
+                {totalMs} с
+              </span>
+            )}
           </span>
         </div>
-        <div className="confidence__scale" style={{ marginTop: 10 }} aria-hidden="true">
-          <div className="confidence__fill" style={{ width: `${confidence.value * 100}%` }} />
-          <span className="confidence__mark" style={{ left: `${confidence.threshold_low * 100}%` }} />
-          <span className="confidence__mark" style={{ left: `${confidence.threshold_high * 100}%` }} />
-        </div>
-        <ul className="trace__list" style={{ marginTop: 10 }}>
-          {confidence.reasons.map((reason, index) => (
-            <li className="trace__item trace__item--wait" key={index}>
-              <span>{reason}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="trace__note">Зона ответа: {zone.label}</p>
-      </section>
 
-      <section className="trace__section">
-        <h3 className="trace__label">Применённая редакция</h3>
-        {trace.edition.applied || trace.edition.note ? (
-          <>
-            <p className="trace__value">{trace.edition.applied ?? "не применялась"}</p>
-            {trace.edition.event_date && (
-              <p className="trace__note">Дата события: {formatDate(trace.edition.event_date)}</p>
-            )}
-            {trace.edition.note && <p className="trace__note">{trace.edition.note}</p>}
-            {trace.edition.conflicted && (
-              <p className="trace__note">
-                <span className="tag tag--revoked">конфликт редакций разрешён кодом (D1)</span>
-              </p>
-            )}
-          </>
-        ) : (
-          <p className="trace__note">Вопрос не про редакции: дата события не указана, документ не редакционный.</p>
-        )}
-      </section>
+        {/* Тело трейса с 5 шагами */}
+        <div className="trace-body" style={{ padding: "var(--sp-4)", display: "grid", gap: "var(--sp-4)" }}>
 
-      <section className="trace__section">
-        <h3 className="trace__label">Проверка цитат</h3>
-        <p className="trace__value">
-          {trace.citations.ok} из {trace.citations.checked} подтверждены
-        </p>
-        {trace.citations.failures.length > 0 ? (
-          <ul className="trace__list" style={{ marginTop: 6 }}>
-            {trace.citations.failures.map((failure, index) => (
-              <li className="trace__item trace__item--fail" key={index}>
-                <span>{failure}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="trace__note">Числа и реквизиты ответа найдены в evidence (verify-lite).</p>
-        )}
-      </section>
-
-      {trace.gates.length > 0 && (
-        <section className="trace__section">
-          <h3 className="trace__label">Гейты и проверки</h3>
-          <ul className="trace__list">
-            {trace.gates.map((gate, index) => (
-              <li
-                className={`trace__item ${gate.passed ? "trace__item--ok" : "trace__item--fail"}`}
-                key={index}
-              >
-                <span>
-                  <strong>{gate.name}</strong>
-                  {gate.detail && <span className="trace__note"> — {gate.detail}</span>}
+          {/* Шаг 1: Тип запроса */}
+          <div className="step step--ok">
+            <div className="num">1</div>
+            <div className="content">
+              <h4>Тип запроса</h4>
+              <div className="tagline" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <span className="tagpill tagpill--ok">
+                  {trace.request_type_label || "Прямой запрос по нормам"}
                 </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                <span className="tagpill">
+                  <code>{trace.request_type || "direct"}</code>
+                </span>
+              </div>
+              {trace.standalone_query && (
+                <div className="kv" style={{ fontSize: "var(--fs-body-small)", color: "var(--text-secondary)", marginTop: 4 }}>
+                  Поисковый запрос: <b style={{ color: "var(--text-primary)" }}>«{trace.standalone_query}»</b>
+                </div>
+              )}
+            </div>
+          </div>
 
-      <section className="trace__section">
-        <h3 className="trace__label">Служебное</h3>
-        <p className="trace__note">
-          retrieval {trace.timings.retrieval_ms} мс · LLM {trace.timings.llm_ms} мс · всего{" "}
-          {trace.timings.total_ms} мс
-        </p>
-        {trace.model && <p className="trace__note">модель: {trace.model}</p>}
-        {trace.degraded.length > 0 && (
-          <p className="trace__note">деградации: {trace.degraded.join("; ")}</p>
-        )}
-      </section>
-    </>
+          {/* Шаг 2: Найденные положения */}
+          <div className="step step--ok">
+            <div className="num">2</div>
+            <div className="content">
+              <h4>Найденные положения ({trace.retrieved?.length || 0})</h4>
+              {dropped.length > 0 && (
+                <div style={{ marginBottom: 6 }}>
+                  <span className="tagpill tagpill--bad">
+                    ⚠ Отброшено инъекций / инструкций: {dropped.length}
+                  </span>
+                </div>
+              )}
+              {trace.retrieved?.length > 0 ? (
+                <div style={{ display: "grid", gap: 4 }}>
+                  {trace.retrieved.slice(0, 5).map((item, idx) => (
+                    <div key={idx} className="ev" style={{ display: "flex", alignItems: "baseline", gap: 8, fontSize: "var(--fs-body-small)" }}>
+                      <span className="ref" style={{ color: "var(--text-link)", fontWeight: 600 }}>
+                        {item.path || "фрагмент"}
+                      </span>
+                      <span style={{ color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {item.short_name || item.doc_id}
+                      </span>
+                      <span className="why" style={{ marginLeft: "auto", color: "var(--text-muted)", fontSize: "var(--fs-caption)" }}>
+                        {item.channel} ({item.score ? Number(item.score).toFixed(2) : ""})
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-body-small)" }}>
+                  Положений выше порога в базе не найдено.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Шаг 3: Применённая редакция */}
+          <div className="step step--ok">
+            <div className="num">3</div>
+            <div className="content">
+              <h4>Применённая редакция</h4>
+              {edition?.applied ? (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span className="tagpill tagpill--ok">✓ {edition.applied}</span>
+                    {edition.conflicted && (
+                      <span className="tagpill tagpill--warn">конфликт редакций разрешён</span>
+                    )}
+                  </div>
+                  {edition.event_date && (
+                    <div className="kv" style={{ marginTop: 6, fontSize: "var(--fs-body-small)" }}>
+                      Дата события: <b>{formatDate(edition.event_date)}</b>
+                    </div>
+                  )}
+                  {edition.note && (
+                    <div style={{ color: "var(--text-muted)", fontSize: "var(--fs-caption)", marginTop: 4 }}>
+                      {edition.note}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ color: "var(--text-secondary)", fontSize: "var(--fs-body-small)" }}>
+                  Документы действуют в единой текущей редакции (без темпоральных конфликтов).
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Шаг 4: Уровень уверенности (Confidence) */}
+          <div className="step step--ok">
+            <div className="num">4</div>
+            <div className="content">
+              <h4>Уровень уверенности</h4>
+              <div
+                className="conf"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "84px 1fr",
+                  gap: "var(--sp-4)",
+                  background: "var(--surface-card)",
+                  border: "1px solid var(--border-subtle)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "var(--sp-3) var(--sp-4)",
+                }}
+              >
+                <div
+                  className="gauge"
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    background: `conic-gradient(${gaugeColor} 0 ${confPct}%, var(--skeleton) ${confPct}% 100%)`,
+                    position: "relative",
+                    alignSelf: "center",
+                  }}
+                  aria-hidden="true"
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 8,
+                      borderRadius: "50%",
+                      background: "var(--surface-card)",
+                      display: "grid",
+                      placeItems: "center",
+                      fontWeight: "bold",
+                      fontSize: "var(--fs-h3)",
+                    }}
+                  >
+                    {confVal.toFixed(2)}
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", alignContent: "center" }}>
+                  <div style={{ fontSize: "var(--fs-caption)", color: "var(--text-muted)", marginBottom: 4 }}>
+                    Зона: <b style={{ color: gaugeColor }}>{normStatus}</b> (порог полного {formatPercent(confidence.threshold_high || 0.72)})
+                  </div>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 4 }}>
+                    {(confidence.reasons || []).slice(0, 4).map((r, idx) => (
+                      <li key={idx} style={{ fontSize: "var(--fs-caption)", color: "var(--text-secondary)", display: "flex", gap: 6 }}>
+                        <span style={{ color: "var(--psb-orange-500)", fontWeight: "bold" }}>→</span>
+                        <span>{r}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Шаг 5: Проверка цитат и гейты */}
+          <div className="step step--ok">
+            <div className="num">5</div>
+            <div className="content">
+              <h4>Проверка цитат и гейты</h4>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {citations && (
+                  <span className={`tagpill ${citations.ok === citations.checked ? "tagpill--ok" : "tagpill--warn"}`}>
+                    Цитаты: {citations.ok}/{citations.checked} подтверждены
+                  </span>
+                )}
+                {gates.map((gate, idx) => (
+                  <span key={idx} className={`tagpill ${gate.passed ? "tagpill--ok" : "tagpill--bad"}`}>
+                    {gate.passed ? "✓" : "✕"} {gate.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Вердикт */}
+          <div
+            className="verdict"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              background: normStatus === "full" ? "var(--status-full-bg)" : normStatus === "partial" ? "var(--status-partial-bg)" : "var(--status-refusal-bg)",
+              border: `1px solid ${gaugeColor}`,
+              borderRadius: "var(--radius-md)",
+              padding: "10px 14px",
+              fontSize: "var(--fs-body-small)",
+            }}
+          >
+            <span style={{ fontWeight: 600, color: gaugeColor }}>
+              Вердикт ядра: {normStatus === "full" ? "Полный ответ сформирован" : normStatus === "partial" ? "Частичный ответ (недостаточно данных)" : "Обоснованный отказ"}
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
   );
 }

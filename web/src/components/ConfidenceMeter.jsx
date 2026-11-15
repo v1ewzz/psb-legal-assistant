@@ -1,18 +1,31 @@
 import { formatPercent } from "../lib/text.js";
 
-/** Компактный индикатор confidence (полоса + число) для карточки ответа. */
-export default function ConfidenceMeter({ value = 0, label = "confidence" }) {
+/**
+ * Индикатор confidence по макету Ивана:
+ * круговой ring (conic-gradient) + подпись «confidence 0.XX».
+ */
+export default function ConfidenceMeter({ value = 0, status = "full" }) {
   const safe = Math.min(1, Math.max(0, Number(value) || 0));
+  const pct = Math.round(safe * 100);
+
+  const colorVar =
+    status === "full" ? "var(--status-full-color)"
+    : status === "partial" ? "var(--status-partial-color)"
+    : status === "refusal" ? "var(--status-refusal-color)"
+    : "var(--status-error-color)";
+
+  const ringStyle = {
+    background: `conic-gradient(${colorVar} 0 ${pct}%, var(--skeleton) ${pct}% 100%)`,
+  };
+
   return (
     <span
-      className="conf"
-      title={`${label}: ${formatPercent(safe)}`}
-      aria-label={`${label}: ${formatPercent(safe)}`}
+      className="confidence-dot"
+      title={`Уверенность ответа: ${formatPercent(safe)} (${pct}%)`}
+      aria-label={`Уверенность ответа: ${formatPercent(safe)}`}
     >
-      <span className="conf__bar" aria-hidden="true">
-        <span className="conf__fill" style={{ width: `${safe * 100}%` }} />
-      </span>
-      {formatPercent(safe)}
+      <span className="ring" style={ringStyle} aria-hidden="true" />
+      <span>confidence {safe.toFixed(2)}</span>
     </span>
   );
 }

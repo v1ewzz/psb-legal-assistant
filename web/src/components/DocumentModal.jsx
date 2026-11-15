@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { loadDoc } from "../api/docs.js";
-import { formatDate, highlightParts, splitPath } from "../lib/text.js";
+import { formatDate, highlightParts } from "../lib/text.js";
 
 /**
- * Просмотр документа с подсветкой фрагмента (§18.1 п.2, §18 DoD).
- *
- * Подсветка — по индексам из контракта (`anchor.start/end` внутри чанка).
- * Если бэкенд не дал индексы, берём смещение цитаты в тексте чанка; и в том,
- * и в другом случае в DOM попадают только текстовые узлы — innerHTML нет.
+ * Просмотр документа с подсветкой фрагмента (§18.1 п.2, макет 05_source_viewer.html).
+ * Подсветка — строго по индексам символов через текстовые узлы (без innerHTML!).
  */
 export default function DocumentModal({ source, onClose }) {
   const [doc, setDoc] = useState(null);
@@ -48,8 +45,6 @@ export default function DocumentModal({ source, onClose }) {
   const visibleChunks = useMemo(() => {
     const chunks = doc?.chunks ?? [];
     const anchorId = source?.anchor?.chunk_id;
-    // Чанк «документ целиком» дублирует абзацы — показываем его только если
-    // именно в него указывает анкор.
     return chunks.filter(
       (chunk) => chunk.path !== "документ целиком" || chunk.chunk_id === anchorId,
     );
@@ -59,92 +54,127 @@ export default function DocumentModal({ source, onClose }) {
 
   return (
     <div
-      className="modal"
+      className="modal-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="doc-title"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="modal__card">
-        <header className="modal__head">
-          <div style={{ flex: 1 }}>
-            <h2 className="modal__title" id="doc-title">
-              {doc?.short_name ?? source?.short_name ?? "Документ"}
-            </h2>
+      <div className="modal" style={{ width: "90%", maxWidth: 860, margin: "auto" }}>
+        {/* Шапка модалки */}
+        <div className="modal-head">
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Хлебные крошки */}
             <div className="crumbs">
-              {crumbs.map((crumb, index) => (
-                <span key={`${crumb}-${index}`}>
-                  {index > 0 && <span className="crumbs__sep"> › </span>}
-                  <span className={index === crumbs.length - 1 ? "crumbs__last" : undefined}>
-                    {crumb}
-                  </span>
+              {crumbs.map((crumb, idx) => (
+                <span key={idx}>
+                  {idx > 0 && <span className="sep"> › </span>}
+                  <span className={idx === crumbs.length - 1 ? "here" : undefined}>{crumb}</span>
                 </span>
               ))}
-              {source?.path && crumbs.length === 1 && <span className="crumbs__last"> · {source.path}</span>}
+              {source?.path && crumbs.length === 1 && <span className="here"> · {source.path}</span>}
+            </div>
+
+            {/* Название документа */}
+            <h2 className="title" style={{ marginTop: 6, fontSize: "var(--fs-h3)", fontWeight: "bold" }}>
+              {doc?.short_name ?? source?.short_name ?? "Документ"}
+            </h2>
+
+            {/* Мета-теги */}
+            <div className="meta" style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+              {source?.doc_date && (
+                <span className="tagpill">от {formatDate(source.doc_date)}</span>
+              )}
+              {source?.valid_from && (
+                <span className="tagpill tagpill--ok">действует с {formatDate(source.valid_from)}</span>
+              )}
+              {source?.valid_to && (
+                <span className="tagpill tagpill--bad">утратил силу {formatDate(source.valid_to)}</span>
+              )}
+              {source?.doc_type && (
+                <span className="tagpill">{source.doc_type === "law" ? "Федеральный закон" : "Документ компании"}</span>
+              )}
+              {source?.score && (
+                <span className="tagpill">релевантность: {(Number(source.score) * 100).toFixed(0)}%</span>
+              )}
             </div>
           </div>
-          <button type="button" className="btn" onClick={onClose} aria-label="Закрыть документ">
-            Закрыть ✕
-          </button>
-        </header>
 
-        <div className="modal__body">
-          {error && <p className="answer__text answer__text--error">{error}</p>}
+          <button type="button" className="close" onClick={onClose} aria-label="Закрыть">
+            ✕
+          </button>
+        </div>
+
+        {/* Тело документа */}
+        <div className="modal-body" style={{ maxHeight: "60vh", overflowY: "auto", padding: "var(--sp-4) var(--sp-5)" }}>
+          {error && <p style={{ color: "var(--status-refusal-color)" }}>{error}</p>}
           {!doc && !error && (
-            <>
-              <div className="skeleton" style={{ width: "80%", marginBottom: 10 }} />
-              <div className="skeleton" style={{ width: "65%", marginBottom: 10 }} />
-              <div className="skeleton" style={{ width: "72%" }} />
-            </>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div className="skeleton" style={{ width: "80%", height: 16 }} />
+              <div className="skeleton" style={{ width: "65%", height: 16 }} />
+              <div className="skeleton" style={{ width: "72%", height: 16 }} />
+            </div>
           )}
-          {doc &&
-            visibleChunks.map((chunk) => {
-              const isAnchor = chunk.chunk_id === source?.anchor?.chunk_id;
-              let start = isAnchor ? source?.anchor?.start : 0;
-              let end = isAnchor ? source?.anchor?.end : 0;
-              if (isAnchor && !(end > start) && source?.quote) {
-                const found = chunk.text.indexOf(source.quote);
-                if (found >= 0) {
-                  start = found;
-                  end = found + source.quote.length;
-                }
-              }
-              const parts = highlightParts(chunk.text, start, end);
-              return (
-                <p
-                  className="doc__chunk"
-                  data-chunk={isAnchor}
-                  key={chunk.chunk_id}
-                  ref={isAnchor ? chunkRef : undefined}
-                >
+
+          {/* Цитата в рамочке */}
+          {source?.quote && (
+            <div className="quote-anchor">
+              <span style={{ fontSize: "var(--fs-caption)", color: "var(--psb-orange-500)", fontWeight: "bold", display: "block", marginBottom: 4 }}>
+                Фрагмент, подтверждающий ответ:
+              </span>
+              <b>«{source.quote}»</b>
+            </div>
+          )}
+
+          {/* Чанки документа с подсветкой */}
+          {visibleChunks.map((chunk) => {
+            const isAnchorChunk = chunk.chunk_id === source?.anchor?.chunk_id;
+            const start = isAnchorChunk ? source?.anchor?.start : undefined;
+            const end = isAnchorChunk ? source?.anchor?.end : undefined;
+            const parts = highlightParts(chunk.text, start, end);
+
+            return (
+              <div
+                key={chunk.chunk_id}
+                ref={isAnchorChunk ? chunkRef : null}
+                className="doc-p"
+                style={{
+                  background: isAnchorChunk ? "rgba(255,92,43,0.06)" : undefined,
+                  borderLeft: isAnchorChunk ? "3px solid var(--psb-orange-500)" : undefined,
+                  paddingLeft: isAnchorChunk ? 10 : 0,
+                  borderRadius: 4,
+                  marginBottom: 14,
+                }}
+              >
+                {chunk.path && (
+                  <span className="ref-in-text" style={{ fontWeight: 600, color: "var(--text-muted)", fontSize: "var(--fs-caption)" }}>
+                    {chunk.path}
+                  </span>
+                )}
+                <span>
                   {parts.map((part, index) =>
                     part.marked ? (
-                      <mark key={index}>{part.text}</mark>
+                      <mark key={index} className="hl">
+                        {part.text}
+                      </mark>
                     ) : (
                       <span key={index}>{part.text}</span>
                     ),
                   )}
-                </p>
-              );
-            })}
-          {doc && visibleChunks.length === 0 && (
-            <p className="answer__text">Текст документа недоступен в индексе.</p>
-          )}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
-        <footer className="modal__foot">
-          <span className="tag">{source?.path || splitPath(source?.path).join(", ") || "фрагмент"}</span>
-          {doc?.doc_date && <span>дата документа: {formatDate(doc.doc_date)}</span>}
-          {doc?.valid_from && <span>действует с {formatDate(doc.valid_from)}</span>}
-          {doc?.valid_to && <span>действовал до {formatDate(doc.valid_to)}</span>}
-          {doc?.edition && <span>редакция от {formatDate(doc.edition)}</span>}
-          {doc?.applies_from && <span>применяется с {formatDate(doc.applies_from)}</span>}
-          {doc?.status === "active" && <span className="tag tag--active">действует</span>}
-          {doc?.status === "revoked" && <span className="tag tag--revoked">утратил силу</span>}
-          <span style={{ marginLeft: "auto" }}>фрагмент подсвечен по индексам чанка</span>
-        </footer>
+        {/* Подвал модалки */}
+        <div className="modal-foot">
+          <span>ID чанка: {source?.anchor?.chunk_id || "весь документ"}</span>
+          <button type="button" className="btn" style={{ marginLeft: "auto" }} onClick={onClose}>
+            Закрыть
+          </button>
+        </div>
       </div>
     </div>
   );

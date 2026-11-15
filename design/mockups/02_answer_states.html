@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>02 · Карточка ответа: 4 статуса · ПСБ Юридический ассистент</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="_base.css">
+<style>
+.grid {
+  max-width: 1180px; margin: var(--sp-4) auto var(--sp-6); padding: 0 var(--sp-5);
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4);
+}
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  box-shadow: var(--shadow-card);
+  position: relative; overflow: hidden;
+}
+.card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; }
+.card--full::before    { background: var(--status-full-color); }
+.card--partial::before { background: var(--status-partial-color); }
+.card--refusal::before { background: var(--status-refusal-color); }
+.card--error::before   { background: var(--status-error-color); }
+
+.card .head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.card .head .q { margin-left: auto; font-size: var(--fs-caption); color: var(--text-muted); font-style: italic; }
+.card .q-line {
+  font-size: var(--fs-body-small); color: var(--text-secondary);
+  background: var(--surface-panel); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 12px;
+}
+.card .q-line b { color: var(--text-primary); font-weight: var(--fw-medium); }
+.card p { line-height: var(--lh-answer); }
+.card .foot {
+  display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center;
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-subtle);
+  font-size: var(--fs-caption); color: var(--text-muted);
+}
+.missing { list-style: none; margin-top: 8px; display: grid; gap: 6px; }
+.missing li {
+  display: flex; gap: 8px; align-items: baseline;
+  font-size: var(--fs-body-small); color: var(--text-secondary);
+  background: var(--bg-danger); border: 1px solid var(--status-refusal-border);
+  border-radius: var(--radius-md); padding: 7px 10px;
+}
+.missing li::before { content: "✕"; color: var(--status-refusal-color); font-weight: var(--fw-bold); }
+
+/* Чипы — галерея вариантов */
+.chip-gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip-lg { font-size: var(--fs-body-small); padding: 4px 10px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="logo"><span class="logo-mark">П</span> ПСБ · Юридический ассистент</span>
+  <span class="tag">макет 02 · данные моковые</span>
+</header>
+
+<h1 class="mock-title">Карточка ответа · 4 статуса</h1>
+<p class="mock-note"><b>Тест 1 секунды:</b> статус различим цветом полосы + бейджем, не читая текст. Цвет ↔ зона ответа D4 (decide.py): <b style="color:var(--status-full-color)">full</b> · <b style="color:var(--status-partial-color)">partial</b> · <b style="color:var(--status-refusal-color)">refusal</b> · <b style="color:var(--status-error-color)">error</b>.</p>
+
+<div class="grid">
+
+  <!-- 1. FULL -->
+  <div class="card card--full">
+    <div class="head">
+      <span class="badge badge--full">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        Полный ответ
+      </span>
+      <span class="q">мультиисточник: закон + регламент + договор</span>
+    </div>
+    <div class="q-line"><b>Вопрос:</b> нужно ли ООО «Меридиан» согласовывать договор поставки с Альфа-Трейд и какова ставка НДС?</div>
+    <p>
+      Согласование обязательно: договор поставки проходит юридическую проверку и визирование
+      до подписания <a class="chip" href="#">Регламент · п. 4.2</a>. Ставка НДС при поставке
+      товаров — 20% <a class="chip" href="#">НК РФ, ст. 164 · ч. 3</a>. Совокупная выручка
+      за 2024 год превышает установленный лимит <a class="chip" href="#">Регламент · п. 2.7</a>.
+    </p>
+    <div class="foot">
+      <span>confidence 0.94</span><span>·</span><span>цитаты 3/3 ✓</span><span>·</span><span>источников: 3</span>
+    </div>
+  </div>
+
+  <!-- 2. PARTIAL -->
+  <div class="card card--partial">
+    <div class="head">
+      <span class="badge badge--partial">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 2v20"/></svg>
+        Частичный ответ
+      </span>
+      <span class="q">часть подвопросов без подтверждения</span>
+    </div>
+    <div class="q-line"><b>Вопрос:</b> какой порядок согласования и какие штрафы за просрочку поставки?</div>
+    <p>
+      Порядок согласования: юридическая проверка → визирование финансового блока →
+      подписание <a class="chip" href="#">Регламент · п. 4.2</a>. По штрафам за просрочку
+      в найденных положениях точная сумма неустойки не установлена — отвечаю
+      только по подтверждённой части.
+    </p>
+    <div class="foot">
+      <span>confidence 0.58</span><span>·</span><span>подвопрос 2 из 2 — нет данных</span>
+    </div>
+  </div>
+
+  <!-- 3. REFUSAL -->
+  <div class="card card--refusal">
+    <div class="head">
+      <span class="badge badge--refusal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 9 6 6M15 9l-6 6"/></svg>
+        Отказ
+      </span>
+      <span class="q">честный отказ ≠ ошибка: показывает, ЧЕГО не хватило</span>
+    </div>
+    <div class="q-line"><b>Вопрос:</b> каков размер пособия по БиР для сотрудницы Меридиан в 2024 году?</div>
+    <p>
+      В предоставленной базе знаний нет документов, достаточных для расчёта пособия
+      по беременности и родам. По памяти отвечать не буду, так как нормы могли измениться.
+    </p>
+    <ul class="missing">
+      <li>не хватает: федеральный закон о пособиях / размер МРОТ-базы</li>
+      <li>в базе есть только НК РФ, ТК РФ и внутренние регламенты Меридиан</li>
+    </ul>
+    <div class="foot">
+      <span>найдено 0 релевантных положений · refusal обоснованный (ограничение 09)</span>
+    </div>
+  </div>
+
+  <!-- 4. ERROR IN QUESTION -->
+  <div class="card card--error">
+    <div class="head">
+      <span class="badge badge--error">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        Ошибка в вопросе
+      </span>
+      <span class="q">не подстраиваемся под пользователя (04-2)</span>
+    </div>
+    <div class="q-line"><b>Вопрос:</b> какая арендная плата по договору А-08, если плата составляет 500 000 рублей?</div>
+    <p>
+      В найденных положениях <a class="chip" href="#">ДС №1 · п. 2.1</a> арендная
+      плата указана 510 000 руб./мес. с 01.10.2024, а не 500 000 — числа 500 000
+      в найденных документах нет. Уточните, пожалуйста, о каком документе и периоде идёт речь.
+    </p>
+    <div class="foot">
+      <span>гейт T5: ложная предпосылка в числе поймана кодом, до LLM</span>
+    </div>
+  </div>
+</div>
+
+<h1 class="mock-title" style="font-size: var(--fs-h3);">Чипы-ссылки на источники (варианты)</h1>
+<div class="mock-note">Клик → модалка просмотра документа (макет 05). Формат: короткое имя · реквизит · опционально редакция/валидность.</div>
+<div style="max-width:1180px; margin: var(--sp-3) auto var(--sp-6); padding: 0 var(--sp-5);">
+  <div class="chip-gallery">
+    <a class="chip chip-lg" href="#">А-08 · п. 3.2</a>
+    <a class="chip chip-lg" href="#">ДС №1 · п. 2.1 · с 01.10.2024</a>
+    <a class="chip chip-lg" href="#">ТК РФ, ст. 70 · ч. 1</a>
+    <a class="chip chip-lg" href="#">НК РФ, ст. 164 · ч. 3</a>
+    <a class="chip chip-lg" href="#">Регламент согласования · п. 4.2 · ред. 01.03.2025</a>
+    <a class="chip chip-lg" href="#">П-17 · п. 5.3 · «Альфа-Трейд»</a>
+    <a class="chip chip-lg" href="#">К-12 · п. 7.1 · с 21.04.2025</a>
+    <a class="chip chip-lg" href="#">ПТ-05 · п. 2.4 · «Альфа-Трейдинг»</a>
+  </div>
+</div>
+
+</body>
+</html>

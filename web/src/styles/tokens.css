@@ -1,69 +1,260 @@
-/**
- * Дизайн-токены — ЧЕРНОВИК (§18.1, до передачи токенов Иваном).
- * Заменяются одним файлом: компоненты используют только переменные ниже,
- * поэтому финальная палитра/типографика Ивана не потребует правок в JSX.
- *
- * Семантика статусов ответа зафиксирована в §18.1 п.1 / DoD:
- * зелёный = полный, жёлтый = частичный, красный = отказ, серый = ошибка в вопросе.
- */
+/* ============================================================
+   ПСБ · Юридический ассистент · дизайн-токены (CSS)
+   Источник правды: design/tokens.json + design/tokens.css
+   Включает токены Ивана + мост совместимости для компонентов Вовы.
+   ============================================================ */
 :root {
-  color-scheme: dark;
+  /* --- Бренд --- */
+  --psb-blue-950: #070F33;
+  --psb-blue-900: #0B1B4D;
+  --psb-blue-850: #102156;
+  --psb-blue-800: #15296E;
+  --psb-blue-700: #1D3585;
+  --psb-blue-600: #2A4A9E;
+  --psb-blue-500: #3E63C4;
+  --psb-orange-500: #FF5C2B;
+  --psb-orange-600: #E8491A;
+  --psb-gradient: linear-gradient(135deg, #FF5C2B 0%, #FF8A50 100%);
 
-  /* Поверхности */
-  --bg: #070c16;
-  --bg-elevated: #0d1524;
-  --bg-panel: #111b2c;
-  --bg-panel-soft: #0f1727;
-  --bg-inset: #0a111d;
-  --border: #1d2a41;
-  --border-strong: #2a3d5c;
+  /* --- Поверхности --- */
+  --surface-page: #070F33;
+  --surface-panel: #0B1B4D;
+  --surface-card: #102156;
+  --surface-card-elevated: #15296E;
+  --surface-hover: #1D3585;
+  --border-subtle: rgba(185, 194, 222, 0.14);
+  --border-strong: rgba(185, 194, 222, 0.28);
 
-  /* Текст */
-  --text: #e9effa;
-  --text-muted: #9aabc7;
-  --text-dim: #6d7f9e;
+  /* --- Текст --- */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B9C2DE;
+  --text-muted: #7A86A8;
+  --text-link: #7FA0FF;
+  --text-link-hover: #A5BCFF;
 
-  /* Акцент (ПСБ-синий + циан) */
-  --accent: #4cc4ff;
-  --accent-strong: #1f9edd;
-  --accent-soft: rgba(76, 196, 255, 0.12);
-  --brand: #173a86;
+  /* --- Статусы ответа (4 состояния, различимы без чтения текста) ---
+     full    → зелёный  ✓ «Полный ответ»
+     partial → жёлтый   ½ «Частичный ответ»
+     refusal → красный  ✕ «Отказ»
+     error   → серый    ? «Ошибка в вопросе»  */
+  --status-full-color: #2FBF71;
+  --status-full-bg: rgba(47, 191, 113, 0.14);
+  --status-full-border: rgba(47, 191, 113, 0.45);
 
-  /* Статусы ответа */
-  --ok: #3ddc97;
-  --ok-soft: rgba(61, 220, 151, 0.14);
-  --warn: #f7c948;
-  --warn-soft: rgba(247, 201, 72, 0.14);
-  --stop: #ff7a7a;
-  --stop-soft: rgba(255, 122, 122, 0.14);
-  --muted: #93a3bd;
-  --muted-soft: rgba(147, 163, 189, 0.14);
+  --status-partial-color: #F5B301;
+  --status-partial-bg: rgba(245, 179, 1, 0.14);
+  --status-partial-border: rgba(245, 179, 1, 0.45);
 
-  /* Типографика */
-  --font: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
-  --font-mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, "Consolas", monospace;
-  --fs-xs: 11px;
-  --fs-sm: 12.5px;
-  --fs-base: 14px;
+  --status-refusal-color: #E5484D;
+  --status-refusal-bg: rgba(229, 72, 77, 0.14);
+  --status-refusal-border: rgba(229, 72, 77, 0.45);
+
+  --status-error-color: #8A93AD;
+  --status-error-bg: rgba(138, 147, 173, 0.14);
+  --status-error-border: rgba(138, 147, 173, 0.45);
+
+  /* --- Состояния --- */
+  --skeleton: rgba(185, 194, 222, 0.10);
+  --skeleton-shimmer: rgba(185, 194, 222, 0.22);
+  --bg-danger: rgba(229, 72, 77, 0.10);
+  --bg-success: rgba(47, 191, 113, 0.10);
+  --hl-fragment: rgba(255, 92, 43, 0.22);
+  --hl-fragment-border: #FF5C2B;
+
+  /* --- Типографика --- */
+  --font-base: 'SB Sans Display', 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  --fs-h1: 28px;
+  --fs-h2: 22px;
+  --fs-h3: 17px;
+  --fs-body: 14.5px;
+  --fs-body-small: 13px;
+  --fs-caption: 11.5px;
+  --fs-badge: 12px;
+  --lh-tight: 1.25;
+  --lh-normal: 1.5;
+  --lh-answer: 1.62;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* --- Отступы (шкала 4/8) --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  /* --- Радиусы --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* --- Тени --- */
+  --shadow-card: 0 2px 12px rgba(3, 7, 22, 0.45);
+  --shadow-modal: 0 12px 48px rgba(3, 7, 22, 0.65);
+
+  /* --- Движение --- */
+  --motion-fast: 120ms ease-out;
+  --motion-normal: 200ms ease-out;
+
+  /* --- Раскладка --- */
+  --chat-max-width: 720px;
+  --sidebar-width: 420px;
+  --timeline-height: 180px;
+
+  /* ============================================================
+     Мост совместимости для исходных стилей Вовы
+     ============================================================ */
+  --bg: var(--surface-page);
+  --bg-elevated: var(--surface-panel);
+  --bg-panel: var(--surface-panel);
+  --bg-panel-soft: var(--surface-card);
+  --bg-inset: var(--psb-blue-950);
+  --border: var(--border-subtle);
+  --border-strong: var(--border-strong);
+
+  --text: var(--text-primary);
+  --text-muted: var(--text-secondary);
+  --text-dim: var(--text-muted);
+
+  --accent: var(--psb-orange-500);
+  --accent-strong: var(--psb-orange-600);
+  --accent-soft: rgba(255, 92, 43, 0.14);
+  --brand: var(--psb-blue-700);
+
+  --ok: var(--status-full-color);
+  --ok-soft: var(--status-full-bg);
+  --warn: var(--status-partial-color);
+  --warn-soft: var(--status-partial-bg);
+  --stop: var(--status-refusal-color);
+  --stop-soft: var(--status-refusal-bg);
+  --muted: var(--status-error-color);
+  --muted-soft: var(--status-error-bg);
+
+  --font: var(--font-base);
+  --fs-xs: var(--fs-caption);
+  --fs-sm: var(--fs-body-small);
+  --fs-base: var(--fs-body);
   --fs-md: 15px;
-  --fs-lg: 18px;
-  --fs-xl: 22px;
+  --fs-lg: var(--fs-h3);
+  --fs-xl: var(--fs-h2);
 
-  /* Ритм */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --radius-sm: 8px;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --shadow: 0 12px 32px rgba(2, 6, 15, 0.55);
-  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-strong);
+  --space-1: var(--sp-1);
+  --space-2: var(--sp-2);
+  --space-3: var(--sp-3);
+  --space-4: var(--sp-4);
+  --space-5: var(--sp-5);
+  --space-6: var(--sp-6);
 
-  /* Раскладка */
+  --radius: var(--radius-md);
+  --shadow: var(--shadow-card);
+  --focus: 0 0 0 2px var(--surface-page), 0 0 0 4px var(--psb-orange-500);
+
   --header-h: 56px;
-  --right-w: 420px;
-  --timeline-h: 184px;
+  --right-w: var(--sidebar-width);
+  --timeline-h: var(--timeline-height);
 }
+
+/* ============================================================
+   Утилиты-компоненты (по спецификации макетов Ивана)
+   ============================================================ */
+
+/* Бейдж статуса: <span class="badge badge--full">…</span> */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-badge);
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.badge--full    { color: var(--status-full-color);    background: var(--status-full-bg);    border: 1px solid var(--status-full-border); }
+.badge--partial { color: var(--status-partial-color); background: var(--status-partial-bg); border: 1px solid var(--status-partial-border); }
+.badge--refusal { color: var(--status-refusal-color); background: var(--status-refusal-bg); border: 1px solid var(--status-refusal-border); }
+.badge--error   { color: var(--status-error-color);   background: var(--status-error-bg);   border: 1px solid var(--status-error-border); }
+
+/* Чип-ссылка на источник в тексте ответа */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  margin: 0 2px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-card-elevated);
+  color: var(--text-link);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: 1px;
+  transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
+}
+.chip:hover {
+  background: var(--surface-hover);
+  border-color: var(--psb-blue-500);
+  color: var(--text-link-hover);
+}
+
+/* Карточка ответа */
+.answer-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+.answer-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--status-full-color);
+}
+.answer-card--full::before    { background: var(--status-full-color); }
+.answer-card--partial::before { background: var(--status-partial-color); }
+.answer-card--refusal::before { background: var(--status-refusal-color); }
+.answer-card--error::before   { background: var(--status-error-color); }
+
+/* Подсветка фрагмента */
+.hl {
+  background: var(--hl-fragment);
+  outline: 2px solid var(--hl-fragment-border);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--text-primary);
+  padding: 1px 2px;
+}
+
+/* Скелетон */
+.skeleton {
+  background: linear-gradient(90deg, var(--skeleton) 25%, var(--skeleton-shimmer) 50%, var(--skeleton) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Курсор стриминга */
+.stream-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: var(--psb-orange-500);
+  animation: blink 900ms step-end infinite;
+  vertical-align: -2px;
+  margin-left: 2px;
+}
+@keyframes blink { 50% { opacity: 0; } }
