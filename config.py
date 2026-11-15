@@ -88,6 +88,10 @@ class Config:
     premise_note: bool = False          # D: расхождение предпосылки в <note> (PREMISE_NOTE=1)
     refusal_retry: bool = True          # E: ретрай при переотказе с exact-ref (рычаг №1; REFUSAL_RETRY=0 выкл)
     missing_norm: bool = True           # D4: заметка о частичном покрытии норм (рычаг №1; MISSING_NORM=0 выкл)
+    verify_v2: bool = True              # рычаг №2: пара число+единица обязана лежать в одном
+                                        # предложении evidence (VERIFY_V2=0 выкл)
+    render_det: bool = True             # рычаг №3: трим LLM-ответа ≤500 по границе предложения
+                                        # + «Источник:» при ≥2 ссылках (RENDER_DET=0 выкл)
 
     @property
     def api_ready(self) -> bool:
@@ -136,6 +140,8 @@ def from_env(env: Optional[Mapping[str, str]] = None) -> Config:
         premise_note=_bool_flag(env.get("PREMISE_NOTE"), False),
         refusal_retry=_bool_flag(env.get("REFUSAL_RETRY"), True),
         missing_norm=_bool_flag(env.get("MISSING_NORM"), True),
+        verify_v2=_bool_flag(env.get("VERIFY_V2"), True),
+        render_det=_bool_flag(env.get("RENDER_DET"), True),
     )
 
 

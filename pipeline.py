@@ -80,8 +80,88 @@ def _normalize_numbers(text: str) -> str:
     return flat.replace(",", ".")
 
 
-def _evidence_bundle(chunks: list[dict]) -> tuple[str, str]:
-    """≤N фрагментов по char_cost (§9.2 упрощённо): текст промпта + строка для verify."""
+# Рычаг №2 (verify v2): классы единиц, рядом с которыми число обязано лежать
+# с той же единицей в ОДНОМ предложении evidence. Глобальной проверки чисел
+# мало: она пропускает подмену единицы («5 рабочих» → «5 календарных»,
+# находка аудита Никиты) и слияние числа из одного пункта с единицей из
+# другого (cross-doc leak, T5/T7).
+UNIT_CLASS_RE = re.compile(
+    r"календарн\w*|рабоч\w*|банковск\w*|процент\w*|%|руб\w*|₽|дн\w*|мес\w*|"
+    r"недел\w*|час\w*|шт\w*|год\w*|лет\b", re.I)
+UNIT_PAIR_RE = re.compile(
+    r"(?P<num>\d+(?:[.,]\d+)?)(?:\s*\([^)]{1,30}\))?\s*"
+    r"(?P<units>(?:(?:в\s+)?(?:календарн\w*|рабоч\w*|банковск\w*|процент\w*|%|руб\w*|₽|"
+    r"дн\w*|мес\w*|недел\w*|час\w*|шт\w*|год\w*|лет)\W*){1,4})", re.I)
+SENT_SPLIT_RE = re.compile(r"(?<=[.!?;])\s+|\n+")
+
+
+def _unit_sig(word: str) -> str:
+    """Канон класса единицы: «дней»/«дня» → «дн», «лет»/«года» → «год»."""
+    w = word.lower()
+    if w in ("%", "₽"):
+        return w
+    for stem, sig in (("календарн", "календарн"), ("рабоч", "рабоч"),
+                      ("банковск", "банковск"), ("процент", "процент"),
+                      ("руб", "руб"), ("дн", "дн"), ("мес", "мес"),
+                      ("недел", "недел"), ("час", "час"), ("шт", "шт"),
+                      ("год", "год"), ("лет", "год")):
+        if w.startswith(stem):
+            return sig
+    return w
+
+
+def _split_sentences(text: str) -> list[str]:
+    return [s for s in SENT_SPLIT_RE.split(text) if s and s.strip()]
+
+
+def _unit_pairs(sentence: str) -> set[tuple[str, tuple[str, ...]]]:
+    """Пары (нормализованное число, сигнатура единиц) одного предложения.
+
+    «450 000» склеивается до «450000», год 1900–2100 не проверяем (даты в
+    evidence пишутся «01.08.2024», эталон Q5 иначе падает)."""
+    flat = re.sub(r"(?<=\d)[\u00a0 ](?=\d)", "", sentence)
+    pairs: set[tuple[str, tuple[str, ...]]] = set()
+    for m in UNIT_PAIR_RE.finditer(flat):
+        raw = m.group("num")
+        number = raw.replace(",", ".").lstrip("0") or "0"
+        if "." not in number and 1900 <= float(number) <= 2100:
+            continue
+        sig: list[str] = []
+        for w in UNIT_CLASS_RE.findall(m.group("units")):
+            s = _unit_sig(w)
+            if s not in sig:
+                sig.append(s)
+        if sig:
+            pairs.add((number, tuple(sig)))
+    return pairs
+
+
+def _unit_pair_problem(answer: str, fragments: list[str]) -> Optional[str]:
+    """Verify v2: каждая пара число+единица ответа обязана опираться на пару
+    из одного предложения какого-то фрагмента. Расплывчатая перефразировка
+    допустима (сигнатура ответа — подмножество сигнатуры evidence: «30 дней»
+    при «30 календарных дней» проходит), добавленная конкретика — нет
+    («30 календарных дней» при «30 дней» падает, подмена единицы падает).
+    None — ок."""
+    evidence: dict[str, list[set[str]]] = {}
+    for frag in fragments:
+        for sent in _split_sentences(frag):
+            for number, units in _unit_pairs(sent):
+                evidence.setdefault(number, []).append(set(units))
+    for sent in _split_sentences(answer):
+        for number, units in _unit_pairs(sent):
+            uset = set(units)
+            if not any(uset <= es for es in evidence.get(number, ())):
+                label = f"{number} " + " ".join(units)
+                return (f"сочетание числа и единицы не найдено единой парой "
+                        f"во фрагментах: «{label}»")
+    return None
+
+
+def _evidence_bundle(chunks: list[dict]) -> tuple[str, str, list[str]]:
+    """≤N фрагментов по char_cost (§9.2 упрощённо): текст промпта + строка
+    для verify + список фрагментов (предложения для verify v2 не склеиваются
+    через границу фрагмента)."""
     parts, total = [], 0
     verify_src = []
     for i, chunk in enumerate(chunks, 1):
@@ -91,7 +171,7 @@ def _evidence_bundle(chunks: list[dict]) -> tuple[str, str]:
         parts.append(f'<fragment id="c{i}">\n{fragment}\n</fragment>')
         verify_src.append(fragment)
         total += len(fragment)
-    return "\n\n".join(parts), "".join(verify_src)
+    return "\n\n".join(parts), "".join(verify_src), verify_src
 
 
 def _verify_lite(answer: str, evidence_text: str,
@@ -248,10 +328,42 @@ def missing_norm_note(question: str, evidence_text: str) -> Optional[str]:
             f"не выдумывай.</note>")
 
 
-def _finalize(answer: str) -> str:
-    """Одна строка, без маркдауна, ≤10 000 символов (§4.1, §15.3 упрощённо)."""
+RENDER_MAX_CHARS = 500     # эталонные ответы 161–444 симв; запас до 500
+RENDER_SOURCE_MAX = 460    # «Источник:» не добавляем, если ответ уже длиннее
+
+
+def _render_refs(text: str) -> list[str]:
+    """Ссылки ответа в порядке появления: «п. 3.1», «№ А-08/2024», «54-ФЗ»."""
+    refs: list[str] = []
+    for rex in (CITE_ITEM_RE, CITE_DOC_RE, CITE_LAW_RE):
+        for m in rex.finditer(text):
+            ref = re.sub(r"\s+", " ", m.group(0)).strip()
+            if ref not in refs:
+                refs.append(ref)
+    return refs
+
+
+def _finalize(answer: str, det: bool = False) -> str:
+    """Одна строка, без маркдауна, ≤10 000 символов (§4.1, §15.3 упрощённо).
+
+    det (рычаг №3, детерминированный render): длинный LLM-ответ режется по
+    границе предложения до ≤500 симв (не посреди числа/слова), при ≥2 ссылках
+    добавляется компактное «Источник: …». Fallback/отказ не трогаем."""
     text = MARKDOWN_RE.sub("", answer)
     text = " ".join(text.split())
+    if det and len(text) > RENDER_MAX_CHARS:
+        cut = text[:RENDER_MAX_CHARS]
+        end = 0
+        for m in re.finditer(r"[.!?](?=\s|$)", cut):
+            end = m.end()
+        if end > 100:
+            text = cut[:end]
+        else:
+            text = cut.rstrip() + "…"
+    if det and len(text) <= RENDER_SOURCE_MAX and "Источник" not in text:
+        refs = _render_refs(text)[:4]
+        if len(refs) >= 2:
+            text = f"{text} Источник: {', '.join(refs)}."
     if len(text) > MAX_ANSWER_CHARS:
         text = text[:MAX_ANSWER_CHARS - 1] + "…"
     return text
@@ -380,7 +492,7 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
         if correction is not None:
             return correction
 
-    prompt, evidence_src = _evidence_bundle(chunks)
+    prompt, evidence_src, fragments = _evidence_bundle(chunks)
     # Заметки C/D: арифметика пени и расхождение предпосылки → <note> в
     # evidence; числа note уходят в whitelist verify (иначе расчёт ронялся
     # в fallback). Гейт T5 и note взаимоисключающие — note не спорит с шаблоном.
@@ -420,10 +532,15 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
             break
         problem = _verify_lite(answer, evidence_src, calc_allowed)
         hard = problem is not None
+        if problem is None and cfg.verify_v2:
+            # Рычаг №2: пара число+единица обязана лежать в одном предложении
+            # evidence (подмены единиц, cross-doc слияния) — провал жёсткий.
+            problem = _unit_pair_problem(answer, fragments)
+            hard = problem is not None
         if problem is None and cfg.citation_lint:
             problem = _citation_problem(answer, evidence_src, question)
         if problem is None:
-            final = _finalize(answer)
+            final = _finalize(answer, cfg.render_det)
             if (cfg.refusal_retry and attempt == 0 and ref_docs
                     and REFUSAL_PAT_RE.search(final)):
                 # E-фикс: переотказ при exact-ref попадании — один ретрай с подсказкой
@@ -436,7 +553,7 @@ def answer_one(question: str, ctx: dict, deadline: float) -> str:
         if not hard and attempt == 1:
             # B-lite не роняет ответ в фолбэк: числа подтверждены, претензия
             # только к ссылке — после одного ретрая принимаем как есть.
-            return _finalize(answer)
+            return _finalize(answer, cfg.render_det)
         last_error = problem
         print(f"Verify-lite (попытка {attempt + 1}): {problem}", file=sys.stderr)
         prompt = f"⚠ В твоём предыдущем ответе было ошибочно: {problem}. Не повторяй этого. Только по фрагментам.\n" + prompt
