@@ -38,8 +38,13 @@
  * @property {string[]} source_ids
  * @property {string} reason
  *
+ * @typedef {Object} PlanStep
+ * @property {string} title        действие («обеспечить санкционную проверку…»)
+ * @property {string} detail       уточнение («инициатор, до подписания»)
+ * @property {string[]} source_ids ссылки на Source.id из этого же ответа
+ *
  * @typedef {Object} Trace
- * @property {string} request_type          direct | dialog | edition | false_premise | not_established | unclear
+ * @property {string} request_type          direct | dialog | edition | false_premise | not_established | unclear | procedure
  * @property {string} request_type_label    подпись для UI
  * @property {string} standalone_query      запрос после разбора диалога
  * @property {Array<{doc_id:string, short_name:string, path:string, score:number, channel:string}>} retrieved
@@ -48,6 +53,8 @@
  * @property {{applied:?string, event_date:?string, note:?string, conflicted:boolean}} edition
  * @property {{checked:number, ok:number, failures:string[]}} citations
  * @property {Array<{name:string, passed:boolean, detail:string}>} gates
+ * @property {PlanStep[]} [plan]        план действий по процедуре (§18.1 п.6, v1.1, опционально)
+ * @property {string[]} [clarifying]    уточняющие вопросы пользователю (§18.1 п.6, v1.1, опционально)
  * @property {string[]} degraded
  * @property {{total_ms:number, retrieval_ms:number, llm_ms:number}} timings
  * @property {string} model
@@ -201,6 +208,16 @@ function normalizeTrace(trace) {
           detail: String(gate?.detail ?? ""),
         }))
       : [],
+    // v1.1, аддитивно: план действий и уточняющие вопросы — бэкенд может
+    // не прислать эти поля, фронт рендерит только то, что есть.
+    plan: Array.isArray(trace.plan)
+      ? trace.plan.map((step, index) => ({
+          title: String(step?.title ?? `Шаг ${index + 1}`),
+          detail: String(step?.detail ?? ""),
+          source_ids: Array.isArray(step?.source_ids) ? step.source_ids.map(String) : [],
+        }))
+      : [],
+    clarifying: Array.isArray(trace.clarifying) ? trace.clarifying.map(String) : [],
     degraded: Array.isArray(trace.degraded) ? trace.degraded.map(String) : [],
     timings: {
       total_ms: Number(trace.timings?.total_ms ?? 0),

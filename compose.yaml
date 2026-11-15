@@ -1,4 +1,8 @@
 # Одна команда поднимает всё: docker compose up (§18.3)
+# api      — FastAPI + ядро (Юсеф): uvicorn webapp:app на :8000
+# web      — статика фронта (Вова): nginx на :8080, /api проксирует на api
+#            http://127.0.0.1:8080 — чат открывается сразу (мок-режим фронта),
+#            когда webapp.py получит SSE-эндпоинты, меняем VITE_API_MODE на sse
 services:
   web:
     build: .
@@ -6,4 +10,16 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    restart: unless-stopped
+
+  web-ui:
+    build:
+      context: ./web
+      args:
+        VITE_API_MODE: mock
+        VITE_API_TARGET: http://web:8000
+    ports:
+      - "8080:80"
+    depends_on:
+      - web
     restart: unless-stopped

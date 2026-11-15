@@ -251,6 +251,7 @@ export default function App() {
               onOpenSource={openSource}
               onOpenPanel={openPanel}
               onRetry={retry}
+              onAsk={ask}
             />
           ))}
         </div>

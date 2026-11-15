@@ -9,6 +9,11 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+# Режим API зашивается в бандл на сборке: mock — работает без бэкенда,
+# sse — живой webapp.py (переключает Юсеф при готовности эндпоинтов).
+ARG VITE_API_MODE=mock
+ENV VITE_API_MODE=$VITE_API_MODE
 RUN npm run build
 
 FROM nginx:1.27-alpine

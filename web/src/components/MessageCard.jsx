@@ -14,6 +14,7 @@ export default function MessageCard({
   onOpenSource,
   onOpenPanel,
   onRetry,
+  onAsk,
 }) {
   if (message.role === "user") {
     return (
@@ -75,6 +76,39 @@ export default function MessageCard({
           {answer?.answer || (streaming ? "" : "Ответ пуст — ядро вернуло пустую строку.")}
           {streaming && <span className="answer__caret" aria-hidden="true" />}
         </p>
+
+        {trace?.plan?.length > 0 && !streaming && (
+          <div className="plan">
+            <span className="plan__title">План действий по процедуре</span>
+            <ol className="plan__list">
+              {trace.plan.map((step, index) => (
+                <li className="plan__step" key={index}>
+                  <span className="plan__num" aria-hidden="true">{index + 1}</span>
+                  <span>
+                    <strong>{step.title}</strong>
+                    {step.detail && <span className="plan__detail"> — {step.detail}</span>}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {trace?.clarifying?.length > 0 && !streaming && (
+          <div className="clarify">
+            <span className="clarify__title">Уточните — и я отвечу по документам:</span>
+            {trace.clarifying.map((question, index) => (
+              <button
+                key={index}
+                type="button"
+                className="hint"
+                onClick={() => onAsk?.(question)}
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+        )}
 
         {sources.length > 0 && (
           <div className="sources" aria-label="Источники ответа">
