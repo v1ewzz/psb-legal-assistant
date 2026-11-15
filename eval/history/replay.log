@@ -1,0 +1,67 @@
+===== [n1] 37db356 =====
+-- build index
+Индекс собран: 255 чанков из 21 файлов; compromised-строк: 1; 0.28 с
+Готово, чанков: 255
+-- solve
+Контекст: чанков=255; bm25=да; llm=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+Verify-lite (попытка 1): число из ответа не найдено в evidence: «481»
+OK -> eval/history/n1.submission.csv (19 строк)
+===== [rules] c5d240f =====
+-- build index
+Индекс собран: 255 чанков из 21 файлов; compromised-строк: 1; 0.26 с
+Готово, чанков: 255
+-- solve
+Контекст: чанков=255; bm25=да; llm=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+OK -> eval/history/rules.submission.csv (19 строк)
+===== [v2] 6c9fade =====
+-- build index
+Индекс собран: 768 чанков из 21 файлов; compromised-строк: 1; 0.37 с
+Готово, чанков: 768
+-- solve
+Пробы: llm=нет; rerank=ок; 3.5 с
+Контекст: чанков=768; bm25=да; llm=да; rerank=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+Analyze-lite не удался: JsonParseError
+OK -> eval/history/v2.submission.csv (19 строк)
+===== [v21] eca3a63 =====
+-- build index
+Индекс собран: 768 чанков из 21 файлов; compromised-строк: 1; 0.4 с
+Готово, чанков: 768
+-- solve
+Пробы: llm=нет; rerank=ок; 2.6 с
+Контекст: чанков=768; bm25=да; llm=да; rerank=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+OK -> eval/history/v21.submission.csv (19 строк)
+===== [v22] 60cd972 =====
+-- build index
+Индекс собран: 768 чанков из 21 файлов; compromised-строк: 1; 0.36 с
+Готово, чанков: 768
+-- solve
+Пробы: llm=нет; rerank=ок; 2.3 с
+Контекст: чанков=768; bm25=да; llm=да; rerank=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+Verify-lite (попытка 1): число из ответа не найдено в evidence: «481500»
+OK -> eval/history/v22.submission.csv (19 строк)
+===== [dense] 35d0099 =====
+-- build index
+Индекс собран: 768 чанков из 21 файлов; compromised-строк: 1; 0.5 с
+Готово, чанков: 768
+-- solve
+Пробы: llm=нет; embed=ок; rerank=ок; 3.6 с
+dense: 768x1024 построено
+Контекст: чанков=768; bm25=да; dense=да; llm=да; rerank=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+OK -> eval/history/dense.submission.csv (19 строк)
+===== [head] da0955a =====
+-- build index
+Индекс собран: 768 чанков из 21 файлов; compromised-строк: 1; 0.35 с
+Готово, чанков: 768
+-- solve
+Пробы: llm=ок; embed=ок; rerank=ок; 4.6 с
+Контекст: чанков=768; bm25=да; dense=нет; llm=да; rerank=да; режим=deepseek/deepseek-v4.1-flash
+Вопросов: 18
+Verify-lite (попытка 1): число из ответа не найдено в evidence: «11152»
+OK -> eval/history/head.submission.csv (19 строк)
+===== REPLAY DONE =====

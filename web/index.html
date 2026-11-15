@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Юридический ассистент — база нормативных документов</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Юридический ассистент</h1>
+    <span class="sub">Ответы по закрытой базе нормативных документов</span>
+  </div>
+  <div id="timeline" class="timeline" title="Таймлайн редакций документов"></div>
+  <button id="resetBtn" class="ghost" type="button">Новый диалог</button>
+</header>
+<main>
+  <section class="chat" aria-label="Чат">
+    <div id="messages" class="messages"></div>
+    <form id="askForm" class="ask">
+      <input id="askInput" autocomplete="off" maxlength="2000"
+             placeholder="Задайте вопрос по документам…">
+      <button type="submit">Спросить</button>
+    </form>
+  </section>
+  <aside class="side" aria-label="Источники и трассировка">
+    <nav class="tabs">
+      <button type="button" data-tab="sources" class="active">Источники</button>
+      <button type="button" data-tab="trace">Как принято решение</button>
+      <button type="button" data-tab="docs">Документы</button>
+    </nav>
+    <div id="tab-sources" class="tab active">
+      <p class="hint">Источники появятся после первого ответа.</p>
+    </div>
+    <div id="tab-trace" class="tab" hidden>
+      <p class="hint">Здесь будет видно, как ассистент пришёл к ответу.</p>
+    </div>
+    <div id="tab-docs" class="tab" hidden>
+      <input id="docSearch" placeholder="Поиск по названию…">
+      <div id="docList" class="doclist"></div>
+      <div id="docView" class="docview" hidden></div>
+    </div>
+  </aside>
+</main>
+<div id="busy" class="busy" hidden>
+  <span class="spinner" aria-hidden="true"></span>
+  <span id="busyStage">Поиск по базе…</span>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

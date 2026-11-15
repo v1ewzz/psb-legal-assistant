@@ -1,0 +1,433 @@
+{
+ "name": "dense",
+ "n": 18,
+ "elapsed_s": 120.9,
+ "modeM": {
+  "MatchRate": 0.5,
+  "WinRate": 0.5,
+  "Score": 0.5
+ },
+ "modeS": {
+  "MatchRate": 0.5,
+  "WinRate": 0.5,
+  "Score": 0.5
+ },
+ "per_q": {
+  "1": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "2": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "3": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "4": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "5": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "6": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "7": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "8": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "9": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "10": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "11": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "12": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "13": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "14": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "15": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "16": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "17": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  },
+  "18": {
+   "s_match": 0.5,
+   "s_pair": 0.5,
+   "halluc": false
+  }
+ },
+ "details": {
+  "('match', '1', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '1', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '1', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '1', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '2', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '2', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '2', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '2', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '3', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '3', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '3', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '3', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '4', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '4', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '4', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '4', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '5', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '5', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '5', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '5', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '6', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '6', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '6', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '6', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '7', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '7', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '7', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '7', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '8', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '8', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '8', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '8', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '9', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '9', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '9', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '9', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '10', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '10', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '10', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '10', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '11', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '11', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '11', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '11', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '12', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '12', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '12', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '12', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '13', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '13', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '13', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '13', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '14', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '14', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '14', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '14', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '15', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '15', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '15', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '15', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '16', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '16', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '16', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '16', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '17', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '17', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '17', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '17', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('match', '18', False)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('match', '18', True)": {
+   "score": 0.5,
+   "hallucination": false,
+   "reason": "judge parse error"
+  },
+  "('pair', '18', False)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  },
+  "('pair', '18', True)": {
+   "score": 0.5,
+   "reason": "judge parse error"
+  }
+ }
+}

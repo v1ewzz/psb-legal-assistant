@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 LEAN = Path(__file__).resolve().parent.parent
-MAIN = Path(r"D:\hackaton_PSB")
+MAIN = LEAN  # материалы demo-18 лежат в этом же репозитории
 sys.path.insert(0, str(LEAN))
 
 from config import from_env

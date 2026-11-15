@@ -1,0 +1,21 @@
+[n1] modeM Score=0.3832 (M=0.4306 W=0.2727) modeS Score=0.3783 (M=0.4236)  -> n1.judge.json
+[rules] modeM Score=0.3049 (M=0.3403 W=0.2222) modeS Score=0.334 (M=0.3819)  -> rules.judge.json
+[v2] modeM Score=0.4658 (M=0.6042 W=0.1429) modeS Score=0.4026 (M=0.5139)  -> v2.judge.json
+[v21] modeM Score=0.5 (M=0.5 W=0.5) modeS Score=0.5 (M=0.5)  -> v21.judge.json
+[v22] modeM Score=0.5 (M=0.5 W=0.5) modeS Score=0.5 (M=0.5)  -> v22.judge.json
+[dense] modeM Score=0.5 (M=0.5 W=0.5) modeS Score=0.5 (M=0.5)  -> dense.judge.json
+[head] modeM Score=0.5 (M=0.5 W=0.5) modeS Score=0.5 (M=0.5)  -> head.judge.json
+[cfc9cad] modeM Score=0.5 (M=0.5 W=0.5) modeS Score=0.5 (M=0.5)  -> cfc9cad.judge.json
+[cfc9cad_sibling2] modeM Score=0.5 (M=0.5 W=0.5) modeS Score=0.5 (M=0.5)  -> cfc9cad_sibling2.judge.json
+
+=== Калибровка vs платформа ===
+сабмит   платформа   modeM   modeS   errM   errS
+n1         0.27400  0.3832  0.3783 +0.109 +0.104
+rules      0.20800  0.3049  0.3340 +0.097 +0.126
+v2         0.23688  0.4658  0.4026 +0.229 +0.166
+v21        0.27615  0.5000  0.5000 +0.224 +0.224
+v22        0.25032  0.5000  0.5000 +0.250 +0.250
+dense      0.26199  0.5000  0.5000 +0.238 +0.238
+head             ?  0.5000  0.5000
+cfc9cad          ?  0.5000  0.5000
+cfc9cad_sibling2         ?  0.5000  0.5000
