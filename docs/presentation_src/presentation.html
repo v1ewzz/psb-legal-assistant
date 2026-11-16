@@ -89,7 +89,7 @@
       <div class="step"><span class="num">1</span>
         <p><b>Репозиторий</b> — весь исходный код, документация и eval:<br>
         <span class="mono" style="font-size:24px;color:var(--orange);font-weight:700;">github.com/v1ewzz/psb-legal-assistant</span><br>
-        <span style="color:var(--mut);font-size:15px;">ветка <b>lean-v1</b> — финальное состояние решения</span></p></div>
+        <span style="color:var(--mut);font-size:15px;">ветка <b>final-v3</b> — финальное состояние решения</span></p></div>
       <div class="step"><span class="num">2</span>
         <p><b>Запуск веб-интерфейса:</b> <span class="mono">docker compose up</span> или <span class="mono">uvicorn webapp:app</span> → откроется на <span class="mono">127.0.0.1:8000</span></p></div>
       <div class="step"><span class="num">3</span>
@@ -101,8 +101,8 @@
       <div class="cardbox">
         <h3>ПОД КАПОТОМ</h3>
         <p style="line-height:1.6;">Модель: <b>DeepSeek V4.1 Flash</b> (по техническому регламенту)<br><br>
-        Поиск: <b>BM25 + doc2query + edges</b> — собственный движок, только закрытая база, без внешних источников<br><br>
-        Каждое утверждение ответа <b>проверяется кодом</b> против фрагментов документов</p>
+        Поиск: <b>BM25 + doc2query + dense + реранк</b> — гибридный движок, только закрытая база, без внешних источников<br><br>
+        Каждое предложение ответа <b>проверяется кодом</b> против фрагментов документов, слабые утверждения — LLM-судьёй</p>
       </div>
     </div>
   </div>
@@ -162,26 +162,26 @@
   <h2>Одно ядро для пакетного режима и веб-чата</h2>
   <div class="content" style="flex-direction:column; gap:20px;">
     <div class="flow">
-      <div class="fstep">parse_dialog<small>диалог, реплики</small></div><div class="farrow">→</div>
-      <div class="fstep">Retrieve<small>BM25 + doc2query, RRF, sibling-fill</small></div><div class="farrow">→</div>
-      <div class="fstep">Evidence<small>≤ 4000 симв., фрагменты по пунктам</small></div><div class="farrow">→</div>
+      <div class="fstep">Dialog<small>последняя реплика, история, rewrite</small></div><div class="farrow">→</div>
+      <div class="fstep">Retrieve<small>BM25+doc2q+dense → RRF → реранк → расширения</small></div><div class="farrow">→</div>
+      <div class="fstep">Evidence<small>≤ 9000 симв., фрагменты по пунктам</small></div><div class="farrow">→</div>
       <div class="fstep">LLM<small>DeepSeek V4.1 Flash, один вызов</small></div><div class="farrow">→</div>
-      <div class="fstep">Verify v2<small>числа+единицы, цитаты, инъекции</small></div><div class="farrow">→</div>
-      <div class="fstep">Render<small>детерминированный вывод</small></div><div class="farrow">→</div>
+      <div class="fstep">Verify<small>числа, ссылки, даты, статус + LLM-судья</small></div><div class="farrow">→</div>
+      <div class="fstep">Post<small>регенерация → трим → fallback</small></div><div class="farrow">→</div>
       <div class="fstep">Зоны<small>full / partial / refusal / error</small></div>
     </div>
     <div class="col" style="flex-direction:row; gap:20px;">
       <div class="cardbox" style="flex:1;">
-        <h3>ПОИСК (СВОЙ ДВИЖОК)</h3>
-        <p>BM25 по чанкам-пунктам + doc2query-расширение индекса + добор sibling-пунктов того же документа. Точный поиск реквизитов («А-08/2024») — отдельным каналом. Без внешних сервисов.</p>
+        <h3>ПОИСК (ГИБРИДНЫЙ)</h3>
+        <p>BM25 по чанкам-пунктам + BM25 по doc2query-вопросам + dense-канал (bge-m3) сливаются RRF; бусты точных реквизитов и редакций, затем реранкер. Расширения: перекрёстные ссылки, связанные документы, соседние пункты. Без внешних сервисов.</p>
       </div>
       <div class="cardbox" style="flex:1;">
         <h3>БЕЗОПАСНОСТЬ ОТВЕТА</h3>
-        <p>Verify v2: каждая пара «число + единица» в ответе обязана лежать в одном предложении документов — подмены «5 рабочих → 5 календарных» невозможны. Цитаты сверяются с фрагментами. При провале — регенерация, затем экстрактивный fallback: <b>никогда не пусто и не выдумка</b>.</p>
+        <p>Постатейная верификация: каждое предложение — числа (млн/тыс), даты, ссылки (пункт существует, статья — из того акта), «календарные vs рабочие». Слабые утверждения судит LLM. Провал → регенерация → удаление неподтверждённого → экстрактивный fallback: <b>никогда не пусто и не выдумка</b>.</p>
       </div>
       <div class="cardbox" style="flex:1;">
         <h3>ИНЖЕНЕРНОЕ ЯДРО</h3>
-        <p>Batch (платформа): пул потоков, дедлайн 16 мин, периодическая запись результатов. Web: FastAPI + SSE — <b>тот же</b> <span class="mono">pipeline.answer_one</span>. 73 автотеста без сети и ключей.</p>
+        <p>Batch (платформа): пул потоков, дедлайн 16 мин, уровни деградации, кэш ответов. Web: FastAPI + SSE — <b>тот же</b> <span class="mono">pipeline.answer_one</span>. 14 автотестов без сети и ключей (ядро) + 6 судейских ловушек.</p>
       </div>
     </div>
   </div>
@@ -320,20 +320,19 @@
   <div class="content">
     <div class="col" style="flex:1.05;">
       <table class="metrics">
-        <tr><td>Базовая линия организаторов (восстановлена по спеке)</td><td class="v">≈ 0.44 локально</td></tr>
-        <tr><td>Сабмит N1 (простой конвейер)</td><td class="v">0.274 платформа</td></tr>
-        <tr><td>v2.1 (чанк-пункты + диалоги + verify)</td><td class="v">0.276 платформа</td></tr>
-        <tr class="hl"><td><b>lean: doc2query-индекс + рычаги доверия</b></td><td class="v">0.289 платформа</td></tr>
-        <tr><td>Локальный eval (18 демо-эталонов)</td><td class="v">0.738 · 17/18</td></tr>
-        <tr><td>Real-LLM сравнение с эталонами</td><td class="v">0.943</td></tr>
-        <tr><td>Автотесты (без сети и ключей)</td><td class="v">73 passed</td></tr>
+        <tr><td>Сабмит N1 (простой конвейер)</td><td class="v">27.4 платформа</td></tr>
+        <tr><td>v2.1 (чанк-пункты + диалоги + verify)</td><td class="v">27.6 платформа</td></tr>
+        <tr><td>v2.2 / head (расширения промпта)</td><td class="v">20.0–25.0 платформа</td></tr>
+        <tr class="hl"><td><b>v3 (финал): гибридный поиск + постатейная верификация</b></td><td class="v">33.302 платформа</td></tr>
+        <tr><td>Real-LLM сравнение с эталонами (18 демо)</td><td class="v">0.943</td></tr>
+        <tr><td>Автотесты ядра (без сети и ключей)</td><td class="v">14 passed</td></tr>
       </table>
     </div>
     <div class="col" style="flex:.9; justify-content:center;">
       <div class="cardbox">
-        <h3>КАЛИБРОВКА СУДЬИ</h3>
-        <p style="line-height:1.55;">Повторный сабмит <b>того же кода</b> через неделю дал ±0.02 — мы измерили шум судьи и не принимаем решений по микродельтам.<br><br>
-        Скорость: <b>2–3 с на вопрос</b>; при тайм-ауте — экстрактивный fallback, дедлайн пакета 16 мин соблюдается.</p>
+        <h3>ЧТО ДАЛО РОСТ +21%</h3>
+        <p style="line-height:1.55;">Не новые правила промпта (они всегда стоили баллов), а <b>код</b>: гибридный поиск с бустами реквизитов и постатейная верификация с судьёй — модель физически не может сказать то, чего нет во фрагментах.<br><br>
+        Скорость: <b>2–3 с на вопрос</b>; дедлайн пакета 16 мин соблюдается — уровни деградации и экстрактивный fallback.</p>
       </div>
     </div>
   </div>
@@ -368,7 +367,7 @@
     <div class="col" style="flex:1.05;">
       <ul class="big">
         <li><b>Уточняющие вопросы перед поиском</b> и план действий по процедурам — контракт API v1.1 уже готов и свёрстан во фронтенде.</li>
-        <li><b>Гибридный поиск:</b> dense-канал bge-m3 + реранк — код каналов уже в ядре, включается флагом.</li>
+        <li><b>Гибридный поиск уже в ядре</b> (BM25+doc2q+dense+реранк); следующий шаг — коннектор к СЭД банка и инкрементальное пополнение базы.</li>
         <li><b>Интеграция с СЭД банка</b> и загрузка документов организации в контуре банка.</li>
         <li><b>Юнит-экономика доверия:</b> трасса ответа как экспортный отчёт для аудитa.</li>
       </ul>

@@ -1,61 +1,71 @@
 # -*- coding: utf-8 -*-
-"""API-клиент прокси (§2.5): chat / embed / rerank + repair JSON + пробы старта.
+"""API-клиент (chat / embeddings / rerank) с устойчивой обработкой ошибок (п.14).
 
-Правила:
-- ретраи: 1–2 повтора на 429/5xx/сетевые сбои, пауза 1–2 с (безлимитные
-  повторные запросы запрещены регламентом);
-- тайм-аут вызова 30–45 с (90 с стартера — много при дедлайне 16 мин);
-- токен: Authorization: Bearer <ключ>; ключи никогда не логируются;
-- эмбеддинги: маппить по item["index"], а не по порядку; L2-нормализация
-  на клиенте; батчи ≤ 64 текстов;
-- реранк: results или data; relevance_score может отсутствовать (⚠ H7) —
-  в этом случае score = None, confidence живёт без rerank-фичи;
-- content у chat может быть строкой или списком блоков — склеиваем.
+- Транспорт: httpx (keep-alive), при его отсутствии — urllib (stdlib).
+- Ретраи на 429/5xx/сетевые сбои/тайм-ауты: максимум max_retries (по умолчанию 2 —
+  регламент запрещает неограниченные повторы), экспоненциальная пауза с джиттером,
+  уважение заголовка Retry-After (кламп), учёт дедлайна.
+- Общий «кулдаун» на 429: все потоки приостанавливаются, а не штурмуют API.
+- Лимит одновременных запросов (семафор) = max_workers.
+- Circuit breaker на канал: после серии подряд неудач канал временно закрывается,
+  вызывающий код деградирует (реранк → RRF, judge → пропуск).
+- 4xx (кроме 408/429) не ретраятся; ошибки разбираются по типам.
+- Тайминги каждого вызова идут в runtime_utils.STATS.
 """
 from __future__ import annotations
 
 import json
 import random
 import re
+import threading
 import time
+import urllib.error
+import urllib.request
 from typing import Any, Iterable, List, Mapping, Optional
 
-import httpx
 import numpy as np
 
 from config import Config, EMBED_BATCH_SIZE
+from runtime_utils import STATS
 
-RETRYABLE_STATUS = {429, 500, 502, 503, 504}
+try:  # httpx есть на платформе; локально может отсутствовать
+    import httpx  # type: ignore
+except Exception:  # pragma: no cover
+    httpx = None  # type: ignore
 
-# Замыкание: JSON-реплей с предохранителями §17.4-Мок-мода на пинги. Замыкание: json
+RETRYABLE_STATUS = {408, 425, 429, 500, 502, 503, 504}
+MAX_RETRY_AFTER_S = 8.0
 
 
 class ApiError(Exception):
-    """Базовая ошибка API-клиента."""
+    pass
 
 
 class ApiStatusError(ApiError):
-    """HTTP-статус вне ретраемого/удачного множества или исчерпаны ретраи."""
-
     def __init__(self, message: str, status: Optional[int] = None):
         super().__init__(message)
         self.status = status
 
 
 class ApiTimeoutError(ApiError):
-    """Тайм-аут вызова (включая исчерпание ретраев на сетевых сбоях)."""
+    pass
+
+
+class ApiDeadlineError(ApiError):
+    """Не хватает времени до дедлайна — вызов не делался."""
+
+
+class CircuitOpenError(ApiError):
+    pass
 
 
 class JsonParseError(ApiError):
-    """Ответ не разбирается как JSON даже после repair (§10.4, шаги 1–3)."""
-
     def __init__(self, raw: str, cause: Optional[BaseException] = None):
         super().__init__(f"не удалось разобрать JSON: {str(cause)[:200]}")
         self.raw = raw
 
 
 def join_content(content: Any) -> str:
-    """content = строка ИЛИ список блоков (§2.5) → плоская строка."""
     if isinstance(content, str):
         return content
     if isinstance(content, list):
@@ -67,7 +77,7 @@ def join_content(content: Any) -> str:
                 text = block.get("text", block.get("content", ""))
                 if isinstance(text, str) and text:
                     parts.append(text)
-        return "".join(parts)  # блоки — сплошной текст, без разделителя
+        return "".join(parts)
     return ""
 
 
@@ -76,27 +86,22 @@ _FENCE = re.compile(r"```(?:json)?\s*(.*?)```", re.S)
 
 
 def parse_lenient_json(text: str) -> Any:
-    """Repair-парсер §10.4 (шаги 1–3). Шаг 4 (повтор LLM) делает вызывающая сторона.
-
-    Попытки: прямой json.loads → ```json-блок → срез от первой {/[ →
-    косметика хвостовых запятых на каждом кандидате.
-    """
     raw = (text or "").strip()
     if not raw:
         raise JsonParseError(raw, ValueError("пустой ответ"))
-
-    candidates: List[str] = [raw]
+    candidates = [raw]
     fence = _FENCE.search(raw)
     if fence:
         candidates.append(fence.group(1).strip())
     first = min((i for i in (raw.find("{"), raw.find("[")) if i != -1), default=-1)
     if first > 0:
         candidates.append(raw[first:])
-
+    last = max(raw.rfind("}"), raw.rfind("]"))
+    if first >= 0 and last > first:
+        candidates.append(raw[first:last + 1])
     first_exc: Optional[BaseException] = None
     for cand in candidates:
-        variants = [cand, re.sub(_TRAILING_COMMA, lambda m: m.group(1), cand)]
-        for variant in variants:
+        for variant in (cand, _TRAILING_COMMA.sub(lambda m: m.group(1), cand)):
             try:
                 return json.loads(variant)
             except json.JSONDecodeError as e:
@@ -104,211 +109,273 @@ def parse_lenient_json(text: str) -> Any:
     raise JsonParseError(raw, first_exc)
 
 
-class LlmClient:
-    """HTTP-клиент трёх API (§2.5). transport — для тестов с httpx.MockTransport."""
+class _Resp:
+    def __init__(self, status: int, text: str, headers: Mapping[str, str]):
+        self.status_code = status
+        self.text = text
+        self.headers = {k.lower(): v for k, v in headers.items()}
 
-    def __init__(
-        self,
-        cfg: Config,
-        *,
-        transport: Optional[httpx.BaseTransport] = None,
-        timeout_s: Optional[float] = None,
-        pause_s: tuple = (1.0, 2.0),
-        max_retries: int = 2,
-    ):
+    def json(self) -> Any:
+        return json.loads(self.text)
+
+
+class _Breaker:
+    def __init__(self, threshold: int = 5, open_s: float = 20.0) -> None:
+        self.threshold, self.open_s = threshold, open_s
+        self.fails = 0
+        self.open_until = 0.0
+        self._lock = threading.Lock()
+
+    def allow(self) -> bool:
+        return time.time() >= self.open_until
+
+    def ok(self) -> None:
+        with self._lock:
+            self.fails = 0
+
+    def fail(self) -> None:
+        with self._lock:
+            self.fails += 1
+            if self.fails >= self.threshold:
+                self.open_until = time.time() + self.open_s
+                self.fails = 0
+
+
+class LlmClient:
+    def __init__(self, cfg: Config, *, transport: Any = None,
+                 timeout_s: Optional[float] = None, pause_s: tuple = (1.0, 2.0),
+                 max_retries: int = 2, force_urllib: bool = False):
         self.cfg = cfg
         self.pause_s = pause_s
-        self.max_retries = max_retries  # 1–2 ретрая §2.5; 0 — для тайм-аут-тестов
-        self.stats = {"chat": 0, "embed_calls": 0, "rerank": 0, "retries": 0}
-        self._http = httpx.Client(
-            base_url=cfg.base_url,
-            timeout=cfg.request_timeout_s if timeout_s is None else timeout_s,
-            transport=transport,
-        )
+        self.max_retries = max(0, min(max_retries, 3))
+        self.timeout_s = cfg.request_timeout_s if timeout_s is None else timeout_s
+        self.stats = {"chat": 0, "embed_calls": 0, "rerank": 0, "retries": 0,
+                      "http_429": 0, "http_5xx": 0, "timeouts": 0}
+        self._slock = threading.Lock()
+        self._cooldown_until = 0.0
+        self._sem = threading.BoundedSemaphore(max(2, cfg.max_workers + 1))
+        self._breakers = {"chat": _Breaker(6, 15.0), "embed": _Breaker(4, 30.0),
+                          "rerank": _Breaker(3, 45.0)}
+        self._http = None
+        if httpx is not None and not force_urllib:
+            try:
+                self._http = httpx.Client(
+                    base_url=cfg.base_url, timeout=self.timeout_s, transport=transport,
+                    limits=httpx.Limits(max_connections=16, max_keepalive_connections=8))
+            except Exception:
+                self._http = None
+
+    def _inc(self, key: str, n: int = 1) -> None:
+        with self._slock:
+            self.stats[key] = self.stats.get(key, 0) + n
 
     def close(self) -> None:
-        self._http.close()
+        if self._http is not None:
+            try:
+                self._http.close()
+            except Exception:
+                pass
 
-    def __enter__(self) -> "LlmClient":
+    def __enter__(self):
         return self
 
     def __exit__(self, *exc) -> None:
         self.close()
 
-    # --- низкоуровневый POST с ретраями ---
+    # ---- транспорт ----
+    def _send(self, path: str, payload: dict, api_key: str, timeout: float) -> _Resp:
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        if self._http is not None:
+            r = self._http.post(path, json=payload, headers=headers, timeout=timeout)
+            return _Resp(r.status_code, r.text, dict(r.headers))
+        req = urllib.request.Request(
+            self.cfg.base_url + path, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310
+                return _Resp(r.status, r.read().decode("utf-8", "replace"), dict(r.headers))
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace") if hasattr(e, "read") else ""
+            return _Resp(e.code, body, dict(e.headers or {}))
 
-    def _post_retry(self, path: str, payload: dict, api_key: str,
-                    retries: Optional[int] = None) -> dict:
-        retries = self.max_retries if retries is None else max(0, retries)
-        last_exc: Optional[BaseException] = None
+    @staticmethod
+    def _is_timeout(e: BaseException) -> bool:
+        if httpx is not None and isinstance(e, httpx.TimeoutException):
+            return True
+        return isinstance(e, (TimeoutError,)) or "timed out" in str(e).lower()
+
+    @staticmethod
+    def _is_network(e: BaseException) -> bool:
+        if httpx is not None and isinstance(e, httpx.TransportError):
+            return True
+        return isinstance(e, (urllib.error.URLError, ConnectionError, OSError))
+
+    def _wait_cooldown(self, deadline: Optional[float]) -> None:
+        wait = self._cooldown_until - time.time()
+        if wait > 0:
+            if deadline is not None and time.time() + wait > deadline:
+                raise ApiDeadlineError("кулдаун 429 выходит за дедлайн")
+            time.sleep(min(wait, MAX_RETRY_AFTER_S))
+
+    def _post_retry(self, path: str, payload: dict, api_key: str, channel: str,
+                    retries: Optional[int] = None, deadline: Optional[float] = None,
+                    timeout_s: Optional[float] = None) -> dict:
+        br = self._breakers[channel]
+        if not br.allow():
+            raise CircuitOpenError(f"{channel}: канал временно закрыт после серии сбоев")
+        retries = self.max_retries if retries is None else max(0, min(retries, 3))
+        last: Optional[BaseException] = None
+        t_call = time.perf_counter()
         for attempt in range(retries + 1):
+            timeout = timeout_s or self.timeout_s
+            if deadline is not None:
+                left = deadline - time.time()
+                if left < 3:
+                    raise ApiDeadlineError(f"{path}: до дедлайна {left:.0f} с")
+                timeout = max(3.0, min(timeout, left - 1))
             if attempt:
-                self.stats["retries"] += 1
-                time.sleep(random.uniform(*self.pause_s))
+                self._inc("retries")
+                pause = random.uniform(*self.pause_s) * (2 ** (attempt - 1))
+                if isinstance(last, ApiStatusError) and getattr(last, "retry_after", None):
+                    pause = max(pause, min(last.retry_after, MAX_RETRY_AFTER_S))  # type: ignore[attr-defined]
+                if deadline is not None and time.time() + pause > deadline - 3:
+                    break
+                time.sleep(pause)
+            self._wait_cooldown(deadline)
             try:
-                resp = self._http.post(
-                    path,
-                    json=payload,
-                    headers={
-                        "Authorization": f"Bearer {api_key}",
-                        "Content-Type": "application/json",
-                    },
-                )
+                with self._sem:
+                    resp = self._send(path, payload, api_key, timeout)
                 if resp.status_code in RETRYABLE_STATUS:
-                    last_exc = ApiStatusError(
-                        f"{path}: HTTP {resp.status_code}: {resp.text[:200]}",
-                        status=resp.status_code,
-                    )
-                    continue  # ретрай
+                    err = ApiStatusError(f"{path}: HTTP {resp.status_code}: {resp.text[:160]}",
+                                         status=resp.status_code)
+                    ra = resp.headers.get("retry-after", "")
+                    try:
+                        err.retry_after = float(ra)  # type: ignore[attr-defined]
+                    except ValueError:
+                        pass
+                    if resp.status_code == 429:
+                        self._inc("http_429")
+                        cool = min(getattr(err, "retry_after", 0) or random.uniform(*self.pause_s),
+                                   MAX_RETRY_AFTER_S)
+                        self._cooldown_until = max(self._cooldown_until, time.time() + cool)
+                    else:
+                        self._inc("http_5xx")
+                    last = err
+                    continue
                 if resp.status_code != 200:
-                    raise ApiStatusError(
-                        f"{path}: HTTP {resp.status_code}: {resp.text[:200]}",
-                        status=resp.status_code,
-                    )
-                return resp.json()
-            except (httpx.TimeoutException, httpx.NetworkError) as e:
-                last_exc = e
-                continue  # ретрай на сетевых сбоях
-        if isinstance(last_exc, httpx.TimeoutException) or (
-            isinstance(last_exc, httpx.NetworkError)
-        ):
-            raise ApiTimeoutError(f"{path}: сетевой тайм-аут/сбой: {last_exc}") from last_exc
-        if isinstance(last_exc, ApiError):
-            raise last_exc
-        raise ApiError(f"{path}: исчерпаны ретраи: {last_exc}")
+                    br.ok()  # клиентская ошибка — не сбой канала
+                    raise ApiStatusError(f"{path}: HTTP {resp.status_code}: {resp.text[:200]}",
+                                         status=resp.status_code)
+                try:
+                    data = resp.json()
+                except ValueError as e:
+                    last = ApiError(f"{path}: невалидный JSON ответа")
+                    continue
+                br.ok()
+                STATS.add(f"api.{channel}", time.perf_counter() - t_call)
+                return data
+            except ApiError as e:
+                if isinstance(e, (ApiDeadlineError, CircuitOpenError)):
+                    raise
+                if isinstance(e, ApiStatusError) and e.status not in RETRYABLE_STATUS:
+                    raise
+                last = e
+            except Exception as e:  # сетевые/тайм-ауты
+                if self._is_timeout(e):
+                    self._inc("timeouts")
+                    last = ApiTimeoutError(f"{path}: тайм-аут {timeout:.0f} с")
+                elif self._is_network(e):
+                    last = ApiTimeoutError(f"{path}: сетевой сбой: {type(e).__name__}")
+                else:
+                    raise ApiError(f"{path}: {type(e).__name__}: {str(e)[:120]}") from e
+        br.fail()
+        STATS.add(f"api.{channel}.failed", time.perf_counter() - t_call)
+        if isinstance(last, ApiError):
+            raise last
+        raise ApiError(f"{path}: исчерпаны ретраи")
 
-    # --- Генерация (§2.5) ---
-
+    # ---- chat ----
     def chat(self, messages: Iterable[Mapping], *, max_tokens: Optional[int] = None,
-             temperature: Optional[float] = None,
-             model: Optional[str] = None) -> str:
+             temperature: Optional[float] = None, model: Optional[str] = None,
+             deadline: Optional[float] = None, retries: Optional[int] = None) -> str:
         payload = {
             "model": model or self.cfg.llm_model,
-            "messages": [
-                {"role": m.get("role", "user"), "content": m.get("content", "")}
-                for m in messages
-            ],
+            "messages": [{"role": m.get("role", "user"), "content": m.get("content", "")}
+                         for m in messages],
             "temperature": self.cfg.temperature if temperature is None else temperature,
             "max_tokens": self.cfg.max_tokens if max_tokens is None
             else min(max_tokens, self.cfg.max_tokens),
         }
-        data = self._post_retry("/chat/completions", payload, self.cfg.llm_api_key)
-        self.stats["chat"] += 1
+        data = self._post_retry("/chat/completions", payload, self.cfg.llm_api_key, "chat",
+                                retries=retries, deadline=deadline)
+        self._inc("chat")
         try:
             content = data["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as e:
-            raise ApiError(
-                f"/chat/completions: неожиданный формат ответа: {str(data)[:200]}"
-            ) from e
+            raise ApiError(f"/chat/completions: неожиданный формат: {str(data)[:160]}") from e
         return join_content(content)
 
     def chat_json(self, messages, **kwargs):
-        """chat() + repair-парсинг JSON (§10.4). Throws JsonParseError."""
-        raw = self.chat(messages, **kwargs)
-        return parse_lenient_json(raw)
+        return parse_lenient_json(self.chat(messages, **kwargs))
 
-    # --- Эмбеддинги (§2.5) ---
-
-    def embed(self, texts: List[str], *, model: Optional[str] = None) -> np.ndarray:
-        """Батчи ≤64, маппинг по index, L2-нормализация. → (n, dim) float64."""
+    # ---- embeddings ----
+    def embed(self, texts: List[str], *, model: Optional[str] = None,
+              deadline: Optional[float] = None) -> np.ndarray:
         texts = [str(t) for t in texts]
         if not texts:
-            raise ValueError("embed: пустой список текстов")
-        out = np.zeros((len(texts), 0), dtype=np.float64)
-        dim: Optional[int] = None
+            raise ValueError("embed: пустой список")
         model = model or self.cfg.emb_model
+        rows: List[Optional[np.ndarray]] = [None] * len(texts)
+        dim: Optional[int] = None
         for start in range(0, len(texts), EMBED_BATCH_SIZE):
             chunk = texts[start:start + EMBED_BATCH_SIZE]
-            payload = {"model": model, "input": chunk, "encoding_format": "float"}
-            data = self._post_retry("/embeddings", payload, self.cfg.embedder_api_key)
-            self.stats["embed_calls"] += 1
+            data = self._post_retry("/embeddings", {"model": model, "input": chunk,
+                                                    "encoding_format": "float"},
+                                    self.cfg.embedder_api_key, "embed", deadline=deadline)
+            self._inc("embed_calls")
             items = data.get("data") or []
             if not items:
-                raise ApiError("/embeddings: пустой ответ data")
-            batch = np.zeros((len(chunk), dim if dim is not None else 0),
-                             dtype=np.float64)
-            for item in items:
+                raise ApiError("/embeddings: пустой data")
+            for pos, item in enumerate(items):
                 try:
-                    idx = int(item["index"])
+                    idx = int(item.get("index", pos))
                     vec = np.asarray(item["embedding"], dtype=np.float64)
-                except (KeyError, ValueError, TypeError) as e:
-                    raise ApiError(f"/embeddings: битый item: {str(item)[:120]}") from e
+                except (KeyError, ValueError, TypeError, AttributeError) as e:
+                    raise ApiError("/embeddings: битый item") from e
                 if dim is None:
                     dim = vec.shape[0]
-                    out = np.zeros((len(texts), dim), dtype=np.float64)
-                    batch = np.zeros((len(chunk), dim), dtype=np.float64)
-                elif vec.shape[0] != dim:
-                    raise ApiError(f"/embeddings: размерность {vec.shape[0]} != {dim}")
-                if not 0 <= idx < len(chunk):
-                    raise ApiError(f"/embeddings: index {idx} вне батча")
-                batch[idx] = vec
-            out[start:start + len(chunk)] = batch
-        # L2-нормализация на клиенте (как стартер)
+                if vec.shape[0] != dim or not 0 <= idx < len(chunk):
+                    raise ApiError("/embeddings: размерность/индекс")
+                rows[start + idx] = vec
+        if any(r is None for r in rows):
+            raise ApiError("/embeddings: часть векторов не вернулась")
+        out = np.vstack(rows)  # type: ignore[arg-type]
         norms = np.linalg.norm(out, axis=1, keepdims=True)
         norms[norms == 0] = 1.0
         return out / norms
 
-    # --- Реранк (§2.5) ---
-
+    # ---- rerank ----
     def rerank(self, query: str, documents: List[str], top_n: int = 8,
-               model: Optional[str] = None) -> List[dict]:
-        """→ [{"index": int, "relevance_score": float|None}] в порядке релевантности."""
-        payload = {
-            "model": model or self.cfg.reranker_model,
-            "query": query,
-            "documents": [str(d) for d in documents],
-            "top_n": top_n,
-        }
-        data = self._post_retry("/rerank", payload, self.cfg.reranker_api_key)
-        self.stats["rerank"] += 1
+               model: Optional[str] = None, deadline: Optional[float] = None) -> List[dict]:
+        payload = {"model": model or self.cfg.reranker_model, "query": query,
+                   "documents": [str(d) for d in documents], "top_n": top_n}
+        data = self._post_retry("/rerank", payload, self.cfg.reranker_api_key, "rerank",
+                                retries=1, deadline=deadline)
+        self._inc("rerank")
         items = data.get("results") or data.get("data") or []
-        out = []
+        out, seen = [], set()
         for item in items:
             try:
                 idx = int(item["index"])
             except (KeyError, ValueError, TypeError) as e:
-                raise ApiError(f"/rerank: битый item: {str(item)[:120]}") from e
-            score = item.get("relevance_score")
-            out.append({
-                "index": idx,
-                "relevance_score": None if score is None else float(score),
-            })
+                raise ApiError("/rerank: битый item") from e
+            if not 0 <= idx < len(documents) or idx in seen:
+                continue
+            seen.add(idx)
+            score = item.get("relevance_score", item.get("score"))
+            try:
+                score = None if score is None else float(score)
+            except (TypeError, ValueError):
+                score = None
+            out.append({"index": idx, "relevance_score": score})
         return out
-
-    # --- Стартовые пробы ≤30 с (§16.3) ---
-
-    def probe_all(self) -> dict:
-        result: dict = {
-            "llm_ok": False,
-            "emb_ok": False,
-            "emb_dim": None,
-            "rerank_ok": False,
-            "rerank_score": False,
-            "rerank_top_n_unrestricted": False,
-            "warnings": [],
-        }
-        t0 = time.monotonic()
-        try:
-            result["llm_ok"] = bool(self.chat(
-                [{"role": "user", "content": "ping"}], max_tokens=5, temperature=0.0
-            ).strip())
-        except ApiError as e:
-            result["warnings"].append(f"llm: {e}")
-        try:
-            vecs = self.embed([
-                "срочный трудовой договор по соглашению сторон",
-                "меридиан договор аренды",
-            ])
-            result["emb_ok"] = vecs.shape[0] == 2
-            result["emb_dim"] = int(vecs.shape[1])
-        except ApiError as e:
-            result["warnings"].append(f"embed: {e}")
-        try:
-            rr = self.rerank("проверка формата реранка", ["документ А", "документ Б"], top_n=8)
-            result["rerank_ok"] = bool(rr)
-            result["rerank_score"] = all(r["relevance_score"] is not None for r in rr)
-            result["rerank_top_n_unrestricted"] = len(rr) == 2
-        except ApiError as e:
-            result["warnings"].append(f"rerank: {e}")
-        result["elapsed_s"] = round(time.monotonic() - t0, 1)
-        return result

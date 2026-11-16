@@ -143,7 +143,7 @@ def main() -> None:
     ids = [s for s in args.ids.split(",") if s] or list(questions)
 
     cfg = config.from_env()
-    ctx = solution.load_context()
+    ctx = pipeline.build_context(config.from_env())
     client = ctx.get("client")
     if client is None:
         print("Нет API-клиента: заполни .env основного репо "

@@ -20,17 +20,20 @@ MODULES = [
     "solution.py",
     "pipeline.py",
     "config.py",
+    "dialog.py",
+    "legalctx.py",
+    "retrieval.py",
+    "verify.py",
+    "runtime_utils.py",
+    "textutil.py",
     "llm_client.py",
     "ingest.py",
-    "retrieval.py",
     "requirements.txt",
 ]
 
 ARTIFACTS = [
     "chunks.jsonl.gz",
     "docs.json",
-    "refs.json",
-    "bm25.index.npz",
     "manifest.json",
 ]
 
