@@ -33,11 +33,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import config
-import guard
-import pipeline
-import temporal
-from retrieval import Retriever, find_artifact, load_chunks
+from quality import fact_in_evidence, number_keys, retained_fragments, unit_kind
 
 UNIT_RE = re.compile(
     r"(\d{1,3}(?:[ \u00a0]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?)[-—–\s]*"
@@ -71,20 +67,21 @@ def load_gold(path: Path) -> dict[str, str]:
 def facts_of(answer: str) -> list[dict]:
     """Числовые факты эталона: число (ключ) + единица рядом + готовый паттерн."""
     facts: list[dict] = []
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     for m in UNIT_RE.finditer(answer):
         raw, unit = m.group(1), m.group(2).lower()
         key = raw.replace("\u00a0", " ").replace(" ", "").replace(",", ".").lstrip("0") or "0"
-        if key in seen:
+        pair = (key, unit_kind(unit))
+        if pair in seen:
             continue
-        seen.add(key)
+        seen.add(pair)
         facts.append({"key": key, "raw": raw, "unit": unit,
                       "pat": _num_pattern(raw, unit),
                       "snippet": answer[max(0, m.start() - 12):m.end() + 12]})
     # даты-ключи без единицы (01.03, 2.4 — номер пункта тоже факт ссылки)
-    for key in sorted(pipeline._number_keys(answer)):
-        if key not in seen and "." in key:
-            seen.add(key)
+    for key in sorted(number_keys(answer)):
+        if key not in {p[0] for p in seen} and "." in key:
+            seen.add((key, "date/ref"))
             facts.append({"key": key, "raw": key, "unit": "date/ref",
                           "pat": _num_pattern(key, "date/ref"),
                           "snippet": key})
@@ -116,7 +113,7 @@ def _num_pattern(raw: str, unit: str) -> re.Pattern:
     parts = [re.escape(p) for p in num.split(" ") if p]
     body = r"[\s\u00a0]?".join(parts)
     unit_head = re.escape(unit[:4])
-    return re.compile(rf"(?<![\d.,]){body}[^\n.]{{0,50}}?{unit_head}", re.I)
+    return re.compile(rf"(?<![\d.,]){body}(?![\d])[^\n.]{{0,50}}?{unit_head}", re.I)
 
 
 
@@ -126,6 +123,16 @@ def run(questions_path: Path, gold_path: Path,
         per_fragment: int | None, max_chars: int | None,
         top_n: int = 8, sibling_fill: bool = False,
         verbose: bool = True) -> dict:
+    # Imports are intentionally lazy: pure evidence tests need no assistant dependencies.
+    import config
+    import guard
+    import pipeline
+    import temporal
+    from retrieval import Retriever, find_artifact, load_chunks
+    if not hasattr(guard, "parse_dialog") or not hasattr(pipeline, "_temporal_text"):
+        raise NotImplementedError(
+            "This retrieval replay adapter targets the v2 pipeline. "
+            "lean-v1 has a different retrieval/bundle interface; do not report replay success.")
     cfg = config.from_env({})
     chunks = load_chunks(cfg)
     npz = find_artifact(cfg, "bm25.index.npz")
@@ -202,9 +209,7 @@ def run(questions_path: Path, gold_path: Path,
                         in enumerate(fact_cache) if fact_matches(fact, text)]
             retr = any(g in topN_ids or g in {c["chunk_id"] for c in expanded}
                        for g in gold_ids)
-            evid = bool(
-                any(g in evidence_ids for g in gold_ids)
-                or (note_text and fact_matches(fact, note_text)))
+            evid = fact_in_evidence(fact["pat"], expanded, per_frag, max_ch, notes)
             cut = retr and not evid
             tot_facts += 1
             tot_retr += int(retr)
@@ -254,14 +259,8 @@ def run(questions_path: Path, gold_path: Path,
 
 def _bundle_ids(expanded: list[dict], per_frag: int, max_chars: int) -> set[str]:
     """Какие чанки реально вошли бы в бандл (та же логика, что _evidence_bundle)."""
-    ids, total = set(), 0
-    for chunk in expanded:
-        frag = str(chunk.get("text_ctx", chunk.get("text", "")))[:per_frag]
-        if total + len(frag) > max_chars:
-            break
-        ids.add(chunk["chunk_id"])
-        total += len(frag)
-    return ids
+    return set(retained_fragments(expanded, per_frag, max_chars))
+
 
 
 def main() -> None:
@@ -273,11 +272,14 @@ def main() -> None:
     ap.add_argument("--top-n", type=int, default=8)
     ap.add_argument("--sibling-fill", action="store_true")
     args = ap.parse_args()
-    cfg = config.from_env({})
-    pf = args.per_fragment if args.per_fragment is not None else cfg.evidence_per_fragment_chars
-    mc = args.max_chars if args.max_chars is not None else cfg.evidence_max_chars
-    run(Path(args.questions), Path(args.gold), pf, mc, top_n=args.top_n,
-        sibling_fill=args.sibling_fill)
+    try:
+        run(Path(args.questions), Path(args.gold), args.per_fragment, args.max_chars,
+            top_n=args.top_n, sibling_fill=args.sibling_fill)
+    except (ModuleNotFoundError, NotImplementedError, FileNotFoundError) as error:
+        import json
+        print(json.dumps({"status": "BLOCKED", "reason": str(error),
+                          "model_run": False}, ensure_ascii=False))
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

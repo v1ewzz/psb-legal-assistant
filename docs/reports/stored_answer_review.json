@@ -1,0 +1,5303 @@
+{
+  "status": "DIAGNOSTIC",
+  "source": "team-provided stored answers",
+  "official_baseline_verified": false,
+  "reports": [
+    {
+      "file": "baseline.submission.csv",
+      "input_sha256": "184f799c6fcd1081be39144da44cbeb08ccfb92c61ba0c6fd74bf4334d554c28",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 6,
+      "rule_fail": 12,
+      "additional_number_review": 14,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [
+            "due:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3",
+              "5"
+            ],
+            "extra_numbers": [],
+            "words": 44,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [
+            "limit:missing",
+            "exception:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": null,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6",
+              "70"
+            ],
+            "extra_numbers": [],
+            "words": 25,
+            "score": 0.4,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [
+            "reason:missing",
+            "no-memory:missing"
+          ],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "13.11",
+              "2"
+            ],
+            "words": 39,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [
+            "correction:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [
+              "3.1"
+            ],
+            "words": 38,
+            "score": 0.3333333333333333,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": false,
+            "units": false,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "01.03",
+              "15000000",
+              "2025"
+            ],
+            "extra_numbers": [],
+            "words": 49,
+            "score": 0.7142857142857143,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [
+            "deadline:missing",
+            "event:missing",
+            "pair:5:business_days"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "17",
+              "2024",
+              "3.3",
+              "5",
+              "6.1"
+            ],
+            "extra_numbers": [
+              "1",
+              "10",
+              "3.1",
+              "3.2"
+            ],
+            "words": 45,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [
+            "yes:missing",
+            "all_day:missing",
+            "transport:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "4.3"
+            ],
+            "extra_numbers": [
+              "1"
+            ],
+            "words": 71,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [
+            "act:missing",
+            "defects:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "17",
+              "2024",
+              "6.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "2",
+              "7714567890"
+            ],
+            "words": 62,
+            "score": 0.6,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [
+            "agreement:missing",
+            "invoice:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "4.1",
+              "4.2",
+              "45"
+            ],
+            "extra_numbers": [
+              "2",
+              "3.2",
+              "7701234567",
+              "7714567890"
+            ],
+            "words": 71,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1.4",
+              "10.01",
+              "2.1",
+              "2023"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "01.03",
+              "2"
+            ],
+            "words": 47,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 41,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "continuation:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "10",
+              "11",
+              "152",
+              "6",
+              "9"
+            ],
+            "extra_numbers": [
+              "1"
+            ],
+            "words": 117,
+            "score": 0.75,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1"
+            ],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [
+            "wear:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "6.3"
+            ],
+            "extra_numbers": [
+              "1",
+              "2",
+              "2.1",
+              "3"
+            ],
+            "words": 73,
+            "score": 0.6,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "05",
+              "2",
+              "20",
+              "2023"
+            ],
+            "words": 57,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [
+            "not_fixed:missing",
+            "manufacturer:missing",
+            "coupon:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "6.1"
+            ],
+            "extra_numbers": [
+              "17",
+              "2",
+              "2024",
+              "3",
+              "3.2"
+            ],
+            "words": 63,
+            "score": 0.6,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [
+            "three:missing",
+            "event:missing",
+            "pair:3:business_days"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3",
+              "3.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "14",
+              "17.02",
+              "2",
+              "412",
+              "5"
+            ],
+            "words": 143,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "cfc9cad.submission.csv",
+      "input_sha256": "a97a8a41eb3b81e25af90bece32b18eae5282b00c6d4499f3bd6ef12f610dab7",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 11,
+      "rule_fail": 7,
+      "additional_number_review": 10,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 42,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3"
+            ],
+            "words": 51,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 29,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [
+            "correction:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": false,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3.1"
+            ],
+            "words": 55,
+            "score": 0.8333333333333334,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [
+            "yes:missing",
+            "old_limit:missing",
+            "old_edition:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "01.03",
+              "10.01",
+              "10000000",
+              "15000000",
+              "2.4",
+              "2023",
+              "2024",
+              "2025"
+            ],
+            "extra_numbers": [],
+            "words": 34,
+            "score": 0.2857142857142857,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 30,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [
+            "yes:missing",
+            "all_day:missing",
+            "transport:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "4.3"
+            ],
+            "extra_numbers": [],
+            "words": 35,
+            "score": 0.3333333333333333,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [
+            "act:missing",
+            "defects:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "3.2"
+            ],
+            "words": 68,
+            "score": 0.4,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [
+            "agreement:missing",
+            "invoice:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "4.1",
+              "4.2",
+              "45"
+            ],
+            "extra_numbers": [
+              "1.1",
+              "1.2",
+              "17",
+              "2.1",
+              "2024",
+              "5.3",
+              "6.1",
+              "7.1",
+              "8.1"
+            ],
+            "words": 61,
+            "score": 0.3333333333333333,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1.4",
+              "2.1"
+            ],
+            "words": 53,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "412"
+            ],
+            "words": 39,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [
+            "applies:missing",
+            "collective:missing",
+            "local:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "70"
+            ],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 0.4,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "152"
+            ],
+            "extra_numbers": [
+              "1",
+              "11152",
+              "3"
+            ],
+            "words": 72,
+            "score": 0.75,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 39,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "6.1"
+            ],
+            "words": 48,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 38,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "05",
+              "2023"
+            ],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 0.8,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [
+            "three:missing",
+            "event:missing",
+            "pair:3:business_days"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3",
+              "3.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "12.05",
+              "14",
+              "17.02",
+              "412",
+              "7"
+            ],
+            "words": 63,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "cfc9cad_sibling2.submission.csv",
+      "input_sha256": "5b098a9d6e88a6ccf0a883ff7ddcb4d653e01717304e33ec9a4b15c6d0afdcb5",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 13,
+      "rule_fail": 5,
+      "additional_number_review": 10,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3"
+            ],
+            "words": 39,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 29,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [
+              "3.1"
+            ],
+            "words": 48,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [
+            "yes:missing",
+            "old_limit:missing",
+            "old_edition:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "01.03",
+              "10.01",
+              "10000000",
+              "15000000",
+              "2.4",
+              "2023",
+              "2024",
+              "2025"
+            ],
+            "extra_numbers": [],
+            "words": 37,
+            "score": 0.2857142857142857,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 39,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [
+            "yes:missing",
+            "all_day:missing",
+            "transport:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "4.3"
+            ],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 0.3333333333333333,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "5",
+              "6.1",
+              "8.1"
+            ],
+            "words": 56,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 49,
+            "score": 0.8333333333333334,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1.4",
+              "14",
+              "17.02",
+              "2.1"
+            ],
+            "words": 47,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 43,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [
+            "applies:missing",
+            "collective:missing",
+            "local:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "70"
+            ],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 0.4,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 66,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "70"
+            ],
+            "words": 46,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "6.1",
+              "6.2"
+            ],
+            "words": 51,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 38,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 42,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [
+            "three:missing",
+            "event:missing",
+            "pair:3:business_days"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "01.03",
+              "3",
+              "3.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "12.05",
+              "412",
+              "7"
+            ],
+            "words": 55,
+            "score": 0.3333333333333333,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "dense.submission.csv",
+      "input_sha256": "0a973fe93cca8df50c9fe53f52a8fb47723874be37f6c8849a29d17519cbd989",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 15,
+      "rule_fail": 3,
+      "additional_number_review": 11,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 34,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "10",
+              "2",
+              "3",
+              "9"
+            ],
+            "words": 63,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 29,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [
+            "correction:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3.1"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": false,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "01.08"
+            ],
+            "words": 51,
+            "score": 0.8571428571428571,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 38,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "5",
+              "6.1",
+              "8.1"
+            ],
+            "words": 53,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 36,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "2.1",
+              "3.1"
+            ],
+            "words": 47,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 43,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "4"
+            ],
+            "words": 31,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "13.11",
+              "5"
+            ],
+            "words": 78,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [
+            "wear:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6.3"
+            ],
+            "extra_numbers": [
+              "15",
+              "2.1"
+            ],
+            "words": 58,
+            "score": 0.4,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 38,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "17",
+              "2024",
+              "24",
+              "5.2"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "head.submission.csv",
+      "input_sha256": "c9cf73269fe361978c9ab70333ff21d1e174f0b115f33f52a3060b843621c389",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 15,
+      "rule_fail": 3,
+      "additional_number_review": 11,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 34,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "9"
+            ],
+            "words": 31,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 29,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [
+            "correction:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [
+              "3.1"
+            ],
+            "words": 44,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": false,
+            "units": false,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "2024"
+            ],
+            "extra_numbers": [
+              "2.3"
+            ],
+            "words": 50,
+            "score": 0.7142857142857143,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "17",
+              "2024"
+            ],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 0.8333333333333334,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "3"
+            ],
+            "words": 43,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "8.1"
+            ],
+            "words": 43,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [
+            "invoice:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "2.1"
+            ],
+            "words": 32,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 36,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "4"
+            ],
+            "words": 31,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 55,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 45,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 37,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "17",
+              "2024",
+              "24",
+              "5.2"
+            ],
+            "words": 58,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 29,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "n1.submission.csv",
+      "input_sha256": "06178eef0699e5c29e07c7c7623a49c891e0ad6be3de44c327909fca0e3af340",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 9,
+      "rule_fail": 9,
+      "additional_number_review": 13,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3"
+            ],
+            "words": 53,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [
+            "invented_benefit_amount:prohibited"
+          ],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "19.06",
+              "2000",
+              "2026",
+              "27093",
+              "82"
+            ],
+            "words": 59,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [
+            "correction:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [
+              "3.1"
+            ],
+            "words": 37,
+            "score": 0.3333333333333333,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [
+            "yes:missing",
+            "old_limit:missing",
+            "old_edition:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "01.03",
+              "10.01",
+              "10000000",
+              "15000000",
+              "2.4",
+              "2023",
+              "2025"
+            ],
+            "extra_numbers": [
+              "08",
+              "1"
+            ],
+            "words": 62,
+            "score": 0.2857142857142857,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [
+              "6.2"
+            ],
+            "words": 35,
+            "score": 0.6666666666666666,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [
+            "yes:missing",
+            "all_day:missing",
+            "transport:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "4.3"
+            ],
+            "extra_numbers": [],
+            "words": 35,
+            "score": 0.3333333333333333,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [
+            "act:missing",
+            "defects:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "3.1",
+              "3.3",
+              "4.1",
+              "4.3"
+            ],
+            "words": 67,
+            "score": 0.4,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [
+            "agreement:missing",
+            "invoice:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "4.1",
+              "4.2",
+              "45"
+            ],
+            "extra_numbers": [
+              "1.1",
+              "2.1"
+            ],
+            "words": 67,
+            "score": 0.3333333333333333,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "01.03"
+            ],
+            "extra_numbers": [
+              "1.4",
+              "14",
+              "17.02",
+              "2.1",
+              "2.2",
+              "3"
+            ],
+            "words": 53,
+            "score": 0.8,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 31,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [
+            "applies:missing",
+            "collective:missing",
+            "local:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "70"
+            ],
+            "extra_numbers": [],
+            "words": 34,
+            "score": 0.4,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "152"
+            ],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 59,
+            "score": 0.75,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "70"
+            ],
+            "words": 40,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "6.2"
+            ],
+            "words": 48,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "20",
+              "3.2"
+            ],
+            "words": 46,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 34,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [
+            "three:missing",
+            "event:missing",
+            "pair:3:business_days"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "01.03",
+              "3",
+              "3.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "12.05",
+              "412",
+              "7"
+            ],
+            "words": 42,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "rules.submission.csv",
+      "input_sha256": "6e640d7bd2747a1714875f3867aaea77396933f4feaa6052e59f7d8e92f3c7ba",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 8,
+      "rule_fail": 10,
+      "additional_number_review": 11,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 22,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [
+            "exception:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3"
+            ],
+            "words": 27,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [
+            "invented_benefit_amount:prohibited"
+          ],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "19.06",
+              "2000",
+              "2026",
+              "27093",
+              "82"
+            ],
+            "words": 55,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 0.5,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [
+            "yes:missing",
+            "old_limit:missing",
+            "old_edition:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "01.03",
+              "10.01",
+              "10000000",
+              "15000000",
+              "2.4",
+              "2023",
+              "2025"
+            ],
+            "extra_numbers": [
+              "08"
+            ],
+            "words": 53,
+            "score": 0.2857142857142857,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [
+              "6.2"
+            ],
+            "words": 31,
+            "score": 0.6666666666666666,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [
+            "yes:missing",
+            "all_day:missing",
+            "transport:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "4.3"
+            ],
+            "extra_numbers": [],
+            "words": 35,
+            "score": 0.3333333333333333,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [
+            "act:missing",
+            "defects:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6.2"
+            ],
+            "extra_numbers": [],
+            "words": 45,
+            "score": 0.4,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [
+            "advance:missing",
+            "agreement:missing",
+            "invoice:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "4.1",
+              "4.2",
+              "45"
+            ],
+            "extra_numbers": [
+              "17",
+              "2.1",
+              "2024",
+              "5.3",
+              "6.1",
+              "7.1",
+              "8.1"
+            ],
+            "words": 52,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1.4",
+              "10.01",
+              "2.2",
+              "2023",
+              "3"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [
+            "request:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [
+            "applies:missing",
+            "collective:missing",
+            "local:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": false,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "70"
+            ],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 0.4,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "152",
+              "9"
+            ],
+            "extra_numbers": [
+              "1"
+            ],
+            "words": 53,
+            "score": 0.75,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": false,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "144",
+              "2026",
+              "2027",
+              "246",
+              "25",
+              "26"
+            ],
+            "words": 86,
+            "score": 0.8,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "12",
+              "20",
+              "3",
+              "3.2"
+            ],
+            "words": 49,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "17",
+              "2024"
+            ],
+            "words": 41,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [
+            "event:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.2"
+            ],
+            "extra_numbers": [
+              "1",
+              "10.01",
+              "12.05",
+              "2023",
+              "412",
+              "7"
+            ],
+            "words": 75,
+            "score": 0.6666666666666666,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "v2.submission.csv",
+      "input_sha256": "86c37ddf174e7cd604fbac42e835018938f71f7e428156802c84081a4d763ecf",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 15,
+      "rule_fail": 3,
+      "additional_number_review": 13,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 25,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [
+            "exception:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3",
+              "9"
+            ],
+            "words": 35,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 28,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [
+              "3.1"
+            ],
+            "words": 33,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": false,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "01.08",
+              "2.3"
+            ],
+            "words": 64,
+            "score": 0.8571428571428571,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "17",
+              "2024"
+            ],
+            "extra_numbers": [],
+            "words": 31,
+            "score": 0.8333333333333334,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 37,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "5",
+              "6.1",
+              "8.1"
+            ],
+            "words": 56,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 43,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "2.1"
+            ],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "412"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "4"
+            ],
+            "words": 32,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "13.11",
+              "5",
+              "8"
+            ],
+            "words": 82,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "10",
+              "2",
+              "3"
+            ],
+            "words": 67,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [
+            "wear:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6.3"
+            ],
+            "extra_numbers": [
+              "15",
+              "2.1"
+            ],
+            "words": 53,
+            "score": 0.4,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 39,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "17",
+              "2024",
+              "24",
+              "5.2"
+            ],
+            "words": 42,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "412"
+            ],
+            "words": 38,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "v21.submission.csv",
+      "input_sha256": "7f4dd75c25844289d3c30f739e5fe3e4b877891c8706d26191b7fa8ba8f75e90",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 16,
+      "rule_fail": 2,
+      "additional_number_review": 14,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "08",
+              "2024",
+              "3.3"
+            ],
+            "extra_numbers": [
+              "1",
+              "3.4",
+              "7"
+            ],
+            "words": 42,
+            "score": 0.6666666666666666,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3",
+              "9"
+            ],
+            "words": 40,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "82"
+            ],
+            "words": 50,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1"
+            ],
+            "words": 43,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": false,
+            "units": false,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "15000000"
+            ],
+            "extra_numbers": [
+              "01.08",
+              "1000000",
+              "2.3"
+            ],
+            "words": 62,
+            "score": 0.7142857142857143,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [],
+            "words": 31,
+            "score": 0.6666666666666666,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "3"
+            ],
+            "words": 42,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "5",
+              "6.1",
+              "8.1"
+            ],
+            "words": 59,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 46,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "2.1"
+            ],
+            "words": 27,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "11",
+              "4"
+            ],
+            "words": 35,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "13.11",
+              "5"
+            ],
+            "words": 72,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 34,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [
+            "wear:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "6.3"
+            ],
+            "extra_numbers": [
+              "15",
+              "2.1",
+              "6.1"
+            ],
+            "words": 66,
+            "score": 0.4,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 31,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "17",
+              "2024",
+              "24",
+              "5.2"
+            ],
+            "words": 53,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 32,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "v22.submission.csv",
+      "input_sha256": "7372964cc1811aa666526f16294ced44d1377157075698f8c13fb407f8f47964",
+      "record_set_sha256": "55909e39febde0097e3d9f20ecd2ed692b4003b37f5c6fe9aadf05ce7784a9d2",
+      "assistant_version_for_stored_answers": "not_independently_verified",
+      "answers": 18,
+      "rule_pass": 16,
+      "rule_fail": 2,
+      "additional_number_review": 14,
+      "semantic_acceptance": "requires_human_review",
+      "model_run": false,
+      "results": [
+        {
+          "id": "1",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3.4",
+              "7"
+            ],
+            "words": 65,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "2",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "3",
+              "9"
+            ],
+            "words": 49,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "3",
+          "rule_failures": [],
+          "manual_review": [
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": null,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 29,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "4",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": false,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.4",
+              "7"
+            ],
+            "extra_numbers": [
+              "3.1",
+              "3.2",
+              "3.3",
+              "5"
+            ],
+            "words": 63,
+            "score": 0.5,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "5",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": false,
+            "units": false,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "15000000"
+            ],
+            "extra_numbers": [
+              "01.08",
+              "2.3"
+            ],
+            "words": 69,
+            "score": 0.7142857142857143,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "6",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "3.3"
+            ],
+            "extra_numbers": [
+              "6.2"
+            ],
+            "words": 45,
+            "score": 0.6666666666666666,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "7",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": false,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "3"
+            ],
+            "words": 61,
+            "score": 0.8333333333333334,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "8",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "15",
+              "5",
+              "6.1",
+              "8.1"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "9",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [
+              "05",
+              "2023"
+            ],
+            "extra_numbers": [],
+            "words": 35,
+            "score": 0.8333333333333334,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "10",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "2.1",
+              "3.1"
+            ],
+            "words": 52,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "11",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": false,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 34,
+            "score": 0.8,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "12",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "4"
+            ],
+            "words": 42,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "13",
+          "rule_failures": [
+            "limits:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "13.11",
+              "5",
+              "8"
+            ],
+            "words": 97,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "14",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": true,
+            "numbers": true,
+            "units": null,
+            "refs": null,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "1",
+              "3"
+            ],
+            "words": 47,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "15",
+          "rule_failures": [
+            "wear:missing"
+          ],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": false,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": false,
+            "units": null,
+            "refs": false,
+            "refusal": false,
+            "length": true,
+            "missing": [
+              "08",
+              "6.3"
+            ],
+            "extra_numbers": [
+              "15",
+              "2.1"
+            ],
+            "words": 48,
+            "score": 0.4,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "16",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "20"
+            ],
+            "words": 41,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "17",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding",
+            "answer_scope"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": null,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [
+              "17",
+              "2024",
+              "24",
+              "5.2"
+            ],
+            "words": 57,
+            "score": 1.0,
+            "needs_review": true,
+            "diagnostic_only": true
+          }
+        },
+        {
+          "id": "18",
+          "rule_failures": [],
+          "manual_review": [
+            "claim_source_binding"
+          ],
+          "rule_pass": true,
+          "semantic_verdict": "not_automatically_established",
+          "diagnostic": {
+            "nonempty": true,
+            "verdict": null,
+            "numbers": true,
+            "units": true,
+            "refs": true,
+            "refusal": true,
+            "length": true,
+            "missing": [],
+            "extra_numbers": [],
+            "words": 33,
+            "score": 1.0,
+            "needs_review": false,
+            "diagnostic_only": true
+          }
+        }
+      ]
+    }
+  ],
+  "model_run": false,
+  "evaluator_files_sha256": {
+    "runner.py": "ea6be504315503fd7fa107ba106ef1ce21526945e444df29c92eca352bd59772",
+    "quality.py": "4ac19530a5eac87bfce42bd7dc87b80f0771eb4814ffedf5ba2a52ed04a8e732"
+  }
+}

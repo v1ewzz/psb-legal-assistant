@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "gold_records": 18,
+  "trap_records": 12,
+  "source_quote_checks": 52,
+  "original_files_checked": 21,
+  "failures": [],
+  "model_run": false,
+  "scope": "dataset provenance and explicit rules, not assistant acceptance",
+  "evaluator_files_sha256": {
+    "runner.py": "ea6be504315503fd7fa107ba106ef1ce21526945e444df29c92eca352bd59772",
+    "quality.py": "4ac19530a5eac87bfce42bd7dc87b80f0771eb4814ffedf5ba2a52ed04a8e732"
+  }
+}

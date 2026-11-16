@@ -1,0 +1,36 @@
+test_all_trap_positive_and_negative_examples (test_eval_quality.QualityTests.test_all_trap_positive_and_negative_examples) ... ok
+test_amount_groups_and_decimals (test_eval_quality.QualityTests.test_amount_groups_and_decimals) ... ok
+test_budget_boundary_includes_exact_size (test_eval_quality.QualityTests.test_budget_boundary_includes_exact_size) ... ok
+test_coverage_module_is_importable_without_project_dependencies (test_eval_quality.QualityTests.test_coverage_module_is_importable_without_project_dependencies) ... ok
+test_coverage_number_is_not_prefix_of_larger_amount (test_eval_quality.QualityTests.test_coverage_number_is_not_prefix_of_larger_amount) ... ok
+test_duplicate_ids_are_rejected (test_eval_quality.QualityTests.test_duplicate_ids_are_rejected) ... ok
+test_empty_answer_cannot_have_perfect_score (test_eval_quality.QualityTests.test_empty_answer_cannot_have_perfect_score) ... ok
+test_empty_answers_are_rejected (test_eval_quality.QualityTests.test_empty_answers_are_rejected) ... ok
+test_extra_amount_is_review_not_silently_accepted (test_eval_quality.QualityTests.test_extra_amount_is_review_not_silently_accepted) ... ok
+test_extra_columns_are_rejected (test_eval_quality.QualityTests.test_extra_columns_are_rejected) ... ok
+test_fact_after_crop_is_not_visible (test_eval_quality.QualityTests.test_fact_after_crop_is_not_visible) ... ok
+test_fact_before_crop_is_visible (test_eval_quality.QualityTests.test_fact_before_crop_is_visible) ... ok
+test_larger_amount_containing_correct_digits_is_rejected (test_eval_quality.QualityTests.test_larger_amount_containing_correct_digits_is_rejected) ... ok
+test_lexical_rules_accept_spelled_parenthetical_numbers (test_eval_quality.QualityTests.test_lexical_rules_accept_spelled_parenthetical_numbers) ... ok
+test_live_evaluator_import_does_not_load_assistant_or_read_env (test_eval_quality.QualityTests.test_live_evaluator_import_does_not_load_assistant_or_read_env) ... ok
+test_manual_review_is_never_hidden (test_eval_quality.QualityTests.test_manual_review_is_never_hidden) ... ok
+test_missing_specific_day_count_is_rejected (test_eval_quality.QualityTests.test_missing_specific_day_count_is_rejected) ... ok
+test_negated_included_costs_are_rejected (test_eval_quality.QualityTests.test_negated_included_costs_are_rejected) ... ok
+test_notes_are_separate_evidence (test_eval_quality.QualityTests.test_notes_are_separate_evidence) ... ok
+test_notes_without_provenance_cannot_bypass_source_restriction (test_eval_quality.QualityTests.test_notes_without_provenance_cannot_bypass_source_restriction) ... ok
+test_penalty_must_apply_cap_to_final_result (test_eval_quality.QualityTests.test_penalty_must_apply_cap_to_final_result) ... ok
+test_period_swap_is_rejected (test_eval_quality.QualityTests.test_period_swap_is_rejected) ... ok
+test_quoted_csv_and_all_ids_are_preserved (test_eval_quality.QualityTests.test_quoted_csv_and_all_ids_are_preserved) ... ok
+test_spelled_numbers_and_parentheses (test_eval_quality.QualityTests.test_spelled_numbers_and_parentheses) ... ok
+test_supported_refusal_is_accepted (test_eval_quality.QualityTests.test_supported_refusal_is_accepted) ... ok
+test_unjustified_refusal_is_flagged (test_eval_quality.QualityTests.test_unjustified_refusal_is_flagged) ... ok
+test_whole_chunk_excluded_by_budget (test_eval_quality.QualityTests.test_whole_chunk_excluded_by_budget) ... ok
+test_word_inside_other_word_is_not_a_unit (test_eval_quality.QualityTests.test_word_inside_other_word_is_not_a_unit) ... ok
+test_wrong_document_does_not_support_fact (test_eval_quality.QualityTests.test_wrong_document_does_not_support_fact) ... ok
+test_wrong_document_is_rejected_by_explicit_rule (test_eval_quality.QualityTests.test_wrong_document_is_rejected_by_explicit_rule) ... ok
+test_xml_escape_changes_actual_budget (test_eval_quality.QualityTests.test_xml_escape_changes_actual_budget) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.015s
+
+OK
