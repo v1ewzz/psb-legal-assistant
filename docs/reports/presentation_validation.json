@@ -1,0 +1,12 @@
+{
+  "reviewed_file": "presentation_reviewed.pdf",
+  "sha256": "9bf2d6c0bd52c3faabebac4e583e18d446cf9dce54d0d1e50db9babdaf8beb3b",
+  "pages": 12,
+  "page_size_points": [
+    960,
+    540
+  ],
+  "visual_review": "all 12 rendered pages inspected; changed page 8 re-inspected",
+  "original_pdf_unchanged": true,
+  "status": "review_copy_not_submission_approval"
+}

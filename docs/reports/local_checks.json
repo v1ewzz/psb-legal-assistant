@@ -1,0 +1,130 @@
+{
+  "time_saratov": "2026-11-16T04:42:21.972288+04:00",
+  "base": "f792b674e27b2e27aed8ee7f92fea379df8cc4c2",
+  "checks": [
+    {
+      "name": "targeted standard-library tests",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_eval_quality.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "original provenance and reference controls",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+        "eval/runner.py",
+        "validate",
+        "--output",
+        "docs/reports/source_validation.json"
+      ],
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "stored-answer replay (diagnostics only)",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+        "eval/runner.py",
+        "history",
+        "--output",
+        "docs/reports/stored_answer_review.json"
+      ],
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "index static audit returns findings",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+        "eval/audit_index.py",
+        "--output",
+        "docs/reports/index_audit.json"
+      ],
+      "returncode": 1,
+      "status": "FINDINGS",
+      "reason": "11 PASS, 3 FAIL, 1 REVIEW; no core fixes in scope"
+    },
+    {
+      "name": "full project pytest availability",
+      "status": "BLOCKED",
+      "reason": "/Users/nikitas/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3: No module named pytest",
+      "returncode": 1
+    },
+    {
+      "name": "retrieval fact coverage",
+      "status": "BLOCKED",
+      "reason": "{\"status\": \"BLOCKED\", \"reason\": \"No module named 'bm25s'\", \"model_run\": false}",
+      "returncode": 2
+    },
+    {
+      "name": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "syntax of modified Python",
+      "status": "PASS",
+      "files": [
+        "eval/quality.py",
+        "eval/runner.py",
+        "eval/real_eval.py",
+        "eval/fact_coverage.py",
+        "eval/audit_index.py",
+        "tests/test_eval_quality.py",
+        "docs/presentation_src/build_reviewed_pdf.py"
+      ]
+    },
+    {
+      "name": "relative documentation links",
+      "status": "PASS"
+    },
+    {
+      "name": "protected implementation unchanged",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "--",
+        "pipeline.py",
+        "guard.py",
+        "ingest.py",
+        "retrieval.py",
+        "solution.py",
+        "config.py",
+        "llm_client.py",
+        "webapp.py",
+        "web",
+        "requirements.txt",
+        "Dockerfile",
+        "compose.yaml",
+        "presentation.pdf"
+      ],
+      "returncode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "tracked file deletions",
+      "status": "PASS",
+      "deleted_files": []
+    }
+  ],
+  "llm_calls": 0,
+  "installations": 0,
+  "agent_file_deletions": 0,
+  "full_assistant_acceptance": "NOT_ESTABLISHED"
+}

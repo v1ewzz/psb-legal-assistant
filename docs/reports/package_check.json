@@ -1,0 +1,34 @@
+{
+  "artifact": "build/nikita-review-20261116/submit.zip",
+  "bytes": 214873,
+  "sha256": "e6084558cb91e17181a5394ead6ec02a588ac6a936ac21160e2d39780e2d2f63",
+  "files": [
+    "solution.py",
+    "pipeline.py",
+    "config.py",
+    "llm_client.py",
+    "ingest.py",
+    "retrieval.py",
+    "requirements.txt",
+    "chunks.jsonl.gz",
+    "docs.json",
+    "refs.json",
+    "bm25.index.npz",
+    "manifest.json"
+  ],
+  "flat_names": true,
+  "syntax_checked": [
+    "solution.py",
+    "pipeline.py",
+    "config.py",
+    "llm_client.py",
+    "ingest.py",
+    "retrieval.py"
+  ],
+  "missing_local_modules": [],
+  "runtime_requirements": "# Только разрешённый набор зависимостей платформы (§2.6).\n# Pinned: перечисленное ниже реально используется Сабмитом №1 (v1, BM25-only).\nhttpx==0.28.1\nnumpy==2.5.4\nbm25s==0.3.16\n\n",
+  "runtime_execution": "NOT_RUN",
+  "installations": false,
+  "api_calls": false,
+  "scope": "archive structure, Python syntax and local import inclusion only"
+}

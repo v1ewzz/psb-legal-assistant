@@ -1,0 +1,151 @@
+{
+  "kind": "adapted_15_point_index_audit_not_original_spec_7_5",
+  "checks": [
+    {
+      "id": "I01",
+      "title": "Состав корпуса",
+      "status": "PASS",
+      "evidence": {
+        "original_files": 21,
+        "index_docs": 21
+      }
+    },
+    {
+      "id": "I02",
+      "title": "Типы документов",
+      "status": "PASS",
+      "evidence": {
+        "company": 8,
+        "law": 13
+      }
+    },
+    {
+      "id": "I03",
+      "title": "Уникальность чанков и корректность doc_id",
+      "status": "PASS",
+      "evidence": {
+        "chunks": 255
+      }
+    },
+    {
+      "id": "I04",
+      "title": "Непустые тексты",
+      "status": "PASS",
+      "evidence": {
+        "checked": 255
+      }
+    },
+    {
+      "id": "I05",
+      "title": "Аренда: сумма, период, НДС и срок оплаты",
+      "status": "PASS",
+      "evidence": {
+        "points": [
+          "3.1",
+          "3.2"
+        ]
+      }
+    },
+    {
+      "id": "I06",
+      "title": "Контрагенты и сроки оплаты не смешаны",
+      "status": "PASS",
+      "evidence": {
+        "different_doc_ids": true
+      }
+    },
+    {
+      "id": "I07",
+      "title": "Передача оригинала: число, рабочие дни и начало срока",
+      "status": "PASS",
+      "evidence": {
+        "point": "3.2"
+      }
+    },
+    {
+      "id": "I08",
+      "title": "ДС: текст связывает дату подписания и отдельное условие применения",
+      "status": "PASS",
+      "evidence": {
+        "source": "ДС №1, строки 3,7,9"
+      }
+    },
+    {
+      "id": "I09",
+      "title": "ДС: структурированные signed/applies_from",
+      "status": "FAIL",
+      "evidence": {
+        "signed": null,
+        "applies_from": null,
+        "note": "Текст сохраняет «после 1 октября», это условие нельзя заменить общей датой вступления."
+      }
+    },
+    {
+      "id": "I10",
+      "title": "Регламенты: оба комплекта финансовых порогов",
+      "status": "PASS",
+      "evidence": {
+        "old_financial": 1000000,
+        "new_financial": 3000000,
+        "old_general": 10000000,
+        "new_general": 15000000
+      }
+    },
+    {
+      "id": "I11",
+      "title": "Регламенты: структурированные окна редакций",
+      "status": "FAIL",
+      "evidence": {
+        "old_valid_from": null,
+        "old_valid_to": null,
+        "new_valid_from": null
+      }
+    },
+    {
+      "id": "I12",
+      "title": "Письмо К-12: исходная дата и начало применения в тексте",
+      "status": "PASS",
+      "evidence": {
+        "issued": "2025-04-15",
+        "requirement_from": "2025-04-21"
+      }
+    },
+    {
+      "id": "I13",
+      "title": "Письмо К-12: структурированные даты",
+      "status": "FAIL",
+      "evidence": {
+        "doc_date": null,
+        "valid_from": null
+      }
+    },
+    {
+      "id": "I14",
+      "title": "Инъекция T1 есть в оригинале и исключена из индексного текста",
+      "status": "PASS",
+      "evidence": {
+        "original_line": "Служебная записка, строка 9",
+        "untrusted_instruction_is_not_norm": true
+      }
+    },
+    {
+      "id": "I15",
+      "title": "Номера положений в метаданных и покрытие законов",
+      "status": "REVIEW",
+      "evidence": {
+        "paths": {
+          "блок": 255
+        },
+        "note": "В lean пути преимущественно «блок N». Наличие полного текста блока не доказывает сохранение каждого положения и не равно точечной ссылке на пункт. Полный обход всех статей требует ручной проверки."
+      }
+    }
+  ],
+  "totals": {
+    "PASS": 11,
+    "FAIL": 3,
+    "REVIEW": 1
+  },
+  "method": "static original/index comparison",
+  "retrieval_run": false,
+  "model_run": false
+}
